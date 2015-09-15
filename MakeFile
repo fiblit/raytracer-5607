@@ -1,0 +1,10 @@
+edit: main.o vector3.o 
+    gcc -o ray main.o vector3.o
+     
+main.o: main.c 
+    gcc -c main.c
+vector3.o: vector3.c vector3.h
+    gcc -c vector3.c
+
+clean :
+     rm ray main.o vector3.o
