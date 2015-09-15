@@ -1,0 +1,8 @@
+Add point class
+Add object/sphere class
+Add color class
+Add GetInFileData functionality
+	- Deal with mtlcolor somehow...
+
+everything else!
+
