@@ -11,3 +11,8 @@ Update README.txt
 
 And everything else!
 
+
+
+Restructure Workplace to allow Code::blocks/git to freely interact with the Repository.
+Begin to try and stop using the IDE.
+
