@@ -3,6 +3,7 @@
 #include <string>
 #include <cctype>
 #include <cstdlib>
+#include "vector3.h"
 
 using namespace std;
 
@@ -12,7 +13,6 @@ int getInFileData(ifstream &inFile, int &width, int &height);
 
 int main()
 {
-
     //GetInFileName
     string fileName;//name of input file
     ifstream inFile;//input file
@@ -68,13 +68,13 @@ int main()
     return 0;
 }
 
-//eye (x,y,z)
-//viewdir (x,y,z)
-//updir (x,y,z)
-//fovh
-//bkgcolor (r,g,b)
-//mtlcolors (r,g,b)
-//spheres (x,y,z,r)
+//eye (x,y,z) //point
+//viewdir (x,y,z) //vector
+//updir (x,y,z) //vector
+//fovh //int?
+//bkgcolor (r,g,b) //rgb
+//mtlcolors (r,g,b) //rgb
+//spheres (x,y,z,r) //sphere (object/sphere?)
 int getInFileData(ifstream &inFile, int &width, int &height)
 {
     string inFileLine;
@@ -125,9 +125,9 @@ string getWord(string& line)
 {
     string word = "";
     int i;
-    for(i=0;isspace(line[i]) && i<line.length();i++)//removes whitespace before word
+    for(i=0;isspace(line[i]) && i<(int)line.length();i++)//removes whitespace before word
         ;
-    while(!isspace(line[i])&&i<line.length())//reads word until whitespace
+    while(!isspace(line[i])&&i<(int)line.length())//reads word until whitespace
     {
         word+=line[i];
         i++;
@@ -141,7 +141,7 @@ bool isInt(string str)
 {
     if(str.length()<1||(str[0]!='-'&&str[0]!='+'&&!isdigit(str[0])))
         return false;//empty string, non-sign or digit first char.
-    for(int i = 1; i<str.length();i++)
+    for(int i = 1; i<(int)str.length();i++)
         if(!isdigit(str[i]))
             return false;//non digit char (after first)
     return true;
