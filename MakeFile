@@ -1,10 +1,12 @@
-edit: main.o vector3.o 
-    gcc -o ray main.o vector3.o
-     
-main.o: main.c 
-    gcc -c main.c
-vector3.o: vector3.c vector3.h
-    gcc -c vector3.c
+debug: main.o vector3.o 
+    g++ -o raytrace main.o vector3.o
+raytrace: main.o vector3.o
+    g++ -o raytrace main.o vector3.o
 
-clean :
-     rm ray main.o vector3.o
+main.o: main.cpp 
+    g++ -Wall -fexceptions -g -std=c++11 -c main.c
+vector3.o: vector3.cpp vector3.h
+    g++ -Wall -fexceptions -g -std=c++11 -c vector3.c
+
+clean:
+     rm raytrace main.o vector3.o
