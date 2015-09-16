@@ -1,8 +1,13 @@
 Add point class
-Add object/sphere class
-Add color class
+Add (object/?)sphere class
+Add rgb class
 Add GetInFileData functionality
 	- Deal with mtlcolor somehow...
+	- vector class, associate rgb mtlcolor with sphere at init?
+Add ray class
+Implement raycast...
 
-everything else!
+Update README.txt
+
+And everything else!
 
