@@ -11,20 +11,31 @@ string getWord(string& line);
 bool isInt(string str);
 int getInFileData(ifstream &inFile, int &width, int &height);
 
-int main()
+int main(int argc, char *argv[])
 {
     //GetInFileName
     string fileName;//name of input file
     ifstream inFile;//input file
-    cout << "Please type the name of an existing .txt file (please include extension): ";
-    getline(cin,fileName);
+	if (argc > 2)
+	{
+		printf("ERROR 6: Invalid call\nUsage: \'%s filename\', or \'%s\' and it will prompt.", argv[0], argv[0]);
+		return 6;//I stopped rewriting all of the Error numbers. I need an error function.
+	}
+	else if (argc == 2)
+		fileName = argv[1];
+	else
+	{
+		cout << "Please type the name of an existing .txt file (please include extension): ";
+		getline(cin,fileName);
+	}
+	
     inFile.open(fileName);
-    if(!inFile.is_open())
+    if (!inFile.is_open())
     {
         cout << "ERROR 1: Nonexistant file.\nPlease enter the name of an existing .txt file.";
         return 1;
     }
-    if(fileName.length()<=4 || fileName.substr(fileName.length()-4,fileName.length()-1)!=".txt")//the length <=4 is to make sure substr can be run in bounds.
+    if (fileName.length()<=4 || fileName.substr(fileName.length()-4,fileName.length()-1)!=".txt")//the length <=4 is to make sure substr can be run in bounds.
     {
         cout << "ERROR 2: Incorrect file extension.\nPlease enter a .txt file.";
         inFile.close();
@@ -47,11 +58,11 @@ int main()
     int x,y,i=0;//i is for counting every 5th pixel.
     for (y = 0; y < imgHeight; y++)//row major
     {
-        for(x = 0; x < imgWidth; x++)
+        for (x = 0; x < imgWidth; x++)
         {
             outFile << (y*255)/(imgHeight-1) << " 128 " << (x*255)/(imgWidth-1);//The -1 is for getting a range of [0,255] rather than [0,254].
             //Green is 128 because I couldn't think of an easier way to make it look nice. :P
-            if(i==4)
+            if (i==4)
             {
                 i=0;
                 outFile << "\n";//every fifth pixel gets a new line.
@@ -80,7 +91,7 @@ int getInFileData(ifstream &inFile, int &width, int &height)
     string inFileLine;
     //TODO: while !@EOF switch statement over header
     getline(inFile,inFileLine);//get keyword
-    if(getWord(inFileLine)!="imsize")
+    if (getWord(inFileLine)!="imsize")
     {
         cout << "ERROR 3: Invalid header keyword.\nPlease place on the first line \"imsize <width> <height>\"." << endl;
         inFile.close();
@@ -89,20 +100,20 @@ int getInFileData(ifstream &inFile, int &width, int &height)
     string strWidth,strHeight;
 
     strWidth=getWord(inFileLine);//get width
-    if(strWidth.length()<1)
+    if (strWidth.length()<1)
     {
         cout << "ERROR 4: Nonexistant width parameter.\nPlease place on the first line \"imsize <width> <height>\"." << endl;
         inFile.close();
         return 4;
     }
     strHeight=getWord(inFileLine);//get heighht
-    if(strHeight.length()<1)
+    if (strHeight.length()<1)
     {
         cout << "ERROR 4: Nonexistant height parameter.\nPlease place on the first line \"imsize <width> <height>\"." << endl;
         inFile.close();
         return 4;
     }
-    if(!isInt(strWidth) || !isInt(strHeight))
+    if (!isInt(strWidth) || !isInt(strHeight))
     {//Checks for non integer type. First two statements check for non-numeral, second two check for floating point.
         cout << "ERROR 5: Invalid width or height parameter.\nPlease have integer width and height parameters." << endl;
         inFile.close();
@@ -125,9 +136,9 @@ string getWord(string& line)
 {
     string word = "";
     int i;
-    for(i=0;isspace(line[i]) && i<(int)line.length();i++)//removes whitespace before word
+    for (i=0;isspace(line[i]) && i<(int)line.length();i++)//removes whitespace before word
         ;
-    while(!isspace(line[i])&&i<(int)line.length())//reads word until whitespace
+    while (!isspace(line[i])&&i<(int)line.length())//reads word until whitespace
     {
         word+=line[i];
         i++;
@@ -139,9 +150,9 @@ string getWord(string& line)
 //Determines if a string is a valid integer.
 bool isInt(string str)
 {
-    if(str.length()<1||(str[0]!='-'&&str[0]!='+'&&!isdigit(str[0])))
+    if (str.length()<1||(str[0]!='-'&&str[0]!='+'&&!isdigit(str[0])))
         return false;//empty string, non-sign or digit first char.
-    for(int i = 1; i<(int)str.length();i++)
+    for (int i = 1; i<(int)str.length();i++)
         if(!isdigit(str[i]))
             return false;//non digit char (after first)
     return true;
