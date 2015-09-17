@@ -10,7 +10,7 @@ point::point(double x, double y, double z)
 }
 
 //vector is shorthand for subtracting origin.
-vector3 point::vector()
+vector3 point::vectorize()
 {
 	return vector3(this->x, this->y, this->z);
 }

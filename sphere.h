@@ -6,6 +6,9 @@ class sphere
 {
     public:
         sphere();
+        sphere(double x, double y, double z, double r);
+        //sphere(point origin, double r);
+
     protected:
     private:
 };
