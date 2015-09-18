@@ -1,5 +1,5 @@
-raytrace: main.o vector3.o point.o
-    g++ -o bin/raytrace obj/main.o obj/vector3.o obj/point.o
+raytrace: main.o vector3.o point.o ray.o sphere.o rgb.o
+    g++ -o bin/raytrace obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o
 
 main.o: main.cpp 
     g++ -Wall -fexceptions -g -std=c++11 -c main.cpp -o obj/main.o
