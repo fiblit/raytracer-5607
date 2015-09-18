@@ -1,6 +1,29 @@
 #include "ray.h"
 
-ray::ray()
+ray::ray() {}
+
+ray::ray(point loc, vector3 dir)
 {
-    //ctor
+    this->loc = loc;
+    this->dir = dir;
+}
+
+point ray::getLoc()
+{
+    return loc;
+}
+
+void ray::setLoc(point p)
+{
+    loc = p;
+}
+
+vector3 ray::getDir()
+{
+    return dir;
+}
+
+void ray::setDir(vector3 dir)
+{
+    this->dir = dir;
 }

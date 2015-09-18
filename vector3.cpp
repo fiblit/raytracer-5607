@@ -2,7 +2,7 @@
 
 using namespace std;
 
-vector3::vector3() { }
+vector3::vector3() {}
 
 vector3::vector3(int x, int y, int z)
 {

@@ -1,6 +1,6 @@
 #include "point.h"
 
-point::point() { }
+point::point() {}
 
 point::point(double x, double y, double z)
 {
@@ -9,8 +9,8 @@ point::point(double x, double y, double z)
 	this->z = z;
 }
 
-//vector is shorthand for subtracting origin.
-vector3 point::vectorize()
+//vect is shorthand for subtracting origin.
+vector3 point::vect()
 {
 	return vector3(this->x, this->y, this->z);
 }
