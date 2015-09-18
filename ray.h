@@ -1,17 +1,21 @@
 #ifndef RAY_H
 #define RAY_H
 
+#include "point.h"
+#include "vector3.h"
 
 class ray
 {
     public:
         ray();
-        ray(point origin, vector3 dir);
-        ray(double x0, double y0, double z0, double xd, double yd, double zd);
-
+        ray(point loc, vector3 dir);
+        point getLoc();
+        void setLoc(point p);
+        vector3 getDir();
+        void setDir(vector3 dir);
     protected:
     private:
-        point origin;
+        point loc;
         vector3 dir;
 };
 

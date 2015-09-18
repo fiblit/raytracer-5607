@@ -1,18 +1,23 @@
-Add point class functionality
-Add (object/?)sphere class functionality
-Add rgb class functionality
-Add GetInFileData functionality
-	- Deal with mtlcolor somehow...
-	- vector class, associate rgb mtlcolor with sphere at init?
-Add ray class functionality
+Write pre-cast computations (viewing window)
+Write the image buffer
 Implement raycast...
+for each pixel
+	for each obj
+		intersect?
+			closer?
+	color of closest?
+Properly output buffer to ppm
 
 Update README.txt
+
+Draw scenes
+
+Fault/Error testing
 
 And everything else!
 
 
 
-Restructure Workplace to allow Code::blocks/git to freely interact with the Repository.
+Restructure Workplace to allow Code::blocks/git to freely interact with the Repository. <- I tried using symbolic links! Code::Blocks killed them!
 Begin to try and stop using the IDE.
 

@@ -8,7 +8,7 @@ class point
     public:
         point();
 		point(double x, double y, double z);
-		vector3 vectorize();
+		vector3 vect();
 		vector3 subtract(point p);
 		void setX(double x);
 		void setY(double y);
