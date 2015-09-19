@@ -26,17 +26,38 @@ vector3 vector3::crossProduct(vector3 v)
 
 double vector3::length()
 {
-    return sqrt(pow(x,2) + pow(y,2) + pow(z,2));
+    return sqrt(pow(this->getX(),2) + pow(this->getY(),2) + pow(this->getZ(),2));
 }
 
 vector3 vector3::scale(double s)
 {
-    return vector3(s*this->getX(), s*this->getY(), s*this->getZ());
+    vector3 ret;
+    ret.setVec(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
+    return ret;
+    //return vector3(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
+}
+
+vector3 vector3::scaler(double s, vector3 u)
+{
+    vector3 ret;
+    ret.setVec(s*(u.getX()), s*(u.getY()), s*(u.getZ()));
+    return ret;
+    //return vector3(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
+}
+
+vector3 vector3::fscale(double s)
+{
+    vector3 ret;
+    ret.setVec((this->getX())/s, (this->getY())/s, (this->getZ())/s);
+    return ret;
+    //return vector3((this->getX())/s, (this->getY())/s, (this->getZ())/s);
 }
 
 vector3 vector3::add(vector3 v)
 {
-    return vector3(this->getX()+v.getX(), this->getY()+v.getY(), this->getZ()+v.getZ());
+    vector3 ret;
+    ret.setVec(this->getX()+v.getX(), this->getY()+v.getY(), this->getZ()+v.getZ());
+    return ret;
 }
 
 vector3 vector3::operator+(const vector3 &u)
@@ -50,9 +71,13 @@ vector3 vector3::operator-(const vector3 &u)
     return this->add(ut.scale(-1));
 }
 
-vector3 vector3::unit()
+vector3 vector3::unit()//TODO: Fix??
 {
-    return this->scale(1/this->length());
+    double l = 1/(this->length());
+    vector3 ret;
+    ret.setVec(l*(this->getX()), l*(this->getY()), l*(this->getZ()));
+    return ret;
+    //return (this->scale(1/(this->length())));
 }
 
 point vector3::toPoint()

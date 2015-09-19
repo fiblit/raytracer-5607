@@ -15,15 +15,16 @@ bool sphere::intersect(ray rr, double &t)
     vector3 rdir = rr.getDir();
     //Assume a = 1 because rdir is normalized.
     double b = 2 * (rdir.getX() * (rloc.getX() - loc.getX()) + rdir.getY() * (rloc.getY() - loc.getY()) + rdir.getZ() * (rloc.getZ() - loc.getZ()));
-    double c = pow(rloc.getX()-loc.getX(),2) + pow(rloc.getY()-loc.getY(),2) + pow(rloc.getZ()-loc.getZ(),2);
+    double c = pow(rloc.getX()-loc.getX(),2) + pow(rloc.getY()-loc.getY(),2) + pow(rloc.getZ()-loc.getZ(),2) - pow(radius, 2);
 
     double discrim = (b * b) - (4 * c);//again assuming a=1
 
     if (discrim < 0.0)
+    {
         return false; //No intersection, ray missed
-
-    double sol1 = ((-b) + sqrt(discrim));
-    double sol2 = ((-b) - sqrt(discrim));
+    }
+    double sol1 = ((-b) + sqrt(discrim))/2;
+    double sol2 = ((-b) - sqrt(discrim))/2;
     if (sol1 < 0)
     {
         if (sol2 < 0)

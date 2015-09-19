@@ -1,12 +1,4 @@
-Write pre-cast computations (viewing window)
-Write the image buffer
-Implement raycast...
-for each pixel
-	for each obj
-		intersect?
-			closer?
-	color of closest?
-Properly output buffer to ppm
+Fix bugs (Fix deltah & deltav equaling (0,0,0))
 
 Update README.txt
 

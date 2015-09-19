@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     if ((errval = getInFileData(inFile, imgWidth, imgHeight, eye, viewdir, updir, fovh, bkgcolor, spheres)))
         return errval;
 
-    /*
+
     //Scene Debug
     cout << "width: " << imgWidth << "\n";
     cout << "height: " << imgHeight << "\n";
@@ -82,6 +82,17 @@ int main(int argc, char *argv[])
     }
     cout << endl;
     //end Scene Debug
+    /*
+    //.unit() Debug
+    vector3 test(3.0,4.0,5.0);
+    cout << test.getX() << endl;
+    cout << test.getY() << endl;
+    cout << test.getZ() << endl;
+    cout << test.scale(2.0).getX() << endl;
+    cout << test.unit().getX() <<" "<< test.unit().getY() <<" "<< test.unit().getZ() << endl;
+    cout << test.unit().length() << endl;
+    return 0;
+    //end Debug
     */
 
     //Image Computations
@@ -100,8 +111,8 @@ int main(int argc, char *argv[])
     point ur = (eye.vect() + nviewdir + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
     point ll = (eye.vect() + nviewdir - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
-    vector3 deltah = ll.subtract(ul).scale(1/(imgHeight-1));
-    vector3 deltav = ur.subtract(ul).scale(1/(imgWidth-1));
+    vector3 deltah = ll.subtract(ul).fscale(imgHeight-1);
+    vector3 deltav = ur.subtract(ul).fscale(imgWidth-1);//TODO: Fix deltah & deltav equaling (0,0,0)
 
     //Raycast/trace loop
     for(int y = 0; y < imgHeight; y++)//for each pixel in image
@@ -109,20 +120,23 @@ int main(int argc, char *argv[])
         for(int x = 0; x < imgWidth; x++)
         {
             imgBuf[y*imgWidth+x] = bkgcolor;//initialize to background
-            sphere *closest = nullptr;
+            int closest = -1;
             double closestInter = numeric_limits<double>::infinity();
-            ray curRay(eye,ul.vect()+deltah.scale(x)+deltav.scale(y));//construct ray
-            for(sphere sph : spheres)//for each sphere (object) in scene
+            ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
+            for(int i = 0; i < spheres.size(); i++)//for each sphere (object) in scene
             {
                 double t;
-                if(sph.intersect(curRay,t) && closestInter > t)//returns true if intersected, assigns closer (non-neg) intersection to t
+                if(spheres[i].intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
                     closestInter = t;
-                    closest = &sph;
+                    closest = i;
                 }
             }
-            if (closest!=nullptr)
-                imgBuf[y*imgWidth+x] = closest->getColor();//TODO: replace getColor() with Sphere::shadeRay(curRay,closestInter)
+            if (closest!=-1)
+            {
+                sphere sph = spheres[closest];
+                imgBuf[y*imgWidth+x] = spheres[closest].getColor();//TODO: replace getColor() with Sphere::shadeRay(curRay,closestInter)
+            }
         }
     }
 
@@ -135,14 +149,12 @@ int main(int argc, char *argv[])
     outFile << imgWidth << " " << imgHeight << "\n";
     outFile << "255 \n";
 
-    //GenerateInterestingImage //TODO: deprecate
-    int x,y,i=0;//i is for counting every 5th pixel.
-    for (y = 0; y < imgHeight; y++)//row major
+    //Generate Output File Body
+    for (int y = 0, i = 0; y < imgHeight; y++)//row major //i is for counting every 5th pixel.
     {
-        for (x = 0; x < imgWidth; x++)
+        for (int x = 0; x < imgWidth; x++)
         {
-            outFile << (y*255)/(imgHeight-1) << " 128 " << (x*255)/(imgWidth-1);//The -1 is for getting a range of [0,255] rather than [0,254].
-            //Green is 128 because I couldn't think of an easier way to make it look nice. :P
+            outFile << 255*imgBuf[y*imgWidth+x].getR() << " " << 255*imgBuf[y*imgWidth+x].getG() << " " << 255*imgBuf[y*imgWidth+x].getB();
             if (i==4)
             {
                 i=0;
