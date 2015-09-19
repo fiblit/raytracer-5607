@@ -36,6 +36,7 @@ bool sphere::intersect(ray rr, double &t)
         t = sol1;
     else
         t = sol2;
+
     return true; //intersection at t
 }
 
