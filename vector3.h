@@ -16,6 +16,8 @@ class vector3
         vector3 unit();
 		point toPoint();
         vector3 scale(double s);
+        vector3 scaler(double s, vector3 u);
+        vector3 fscale(double s);
         vector3 add(vector3 v);
         vector3 operator+ (const vector3 &u);
         vector3 operator- (const vector3 &u);
