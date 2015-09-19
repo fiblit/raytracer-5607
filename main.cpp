@@ -3,12 +3,13 @@
 #include <string>
 #include <cctype>
 #include <cstdlib>
-#include "vector3.h"
-#include "point.h"
+#include <vector>
+#include <limits>
+//#include "vector3.h"
+//#include "point.h"
 #include "sphere.h"
 #include "rgb.h"
 #include "ray.h"
-#include <vector>
 
 using namespace std;
 
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
 
     //Read Scene
     int errval;
-    int imgWidth, imgHeight;
+    int imgWidth, imgHeight;//actually shouldn't they all be const?
     point eye;
     vector3 viewdir, updir;
     double fovh;
@@ -65,7 +66,8 @@ int main(int argc, char *argv[])
     if ((errval = getInFileData(inFile, imgWidth, imgHeight, eye, viewdir, updir, fovh, bkgcolor, spheres)))
         return errval;
 
-    /*Test Scene
+    /*
+    //Scene Debug
     cout << "width: " << imgWidth << "\n";
     cout << "height: " << imgHeight << "\n";
     cout << "eye: " << eye.getX() << " : " << eye.getY() << " : " << eye.getZ() << "\n";
@@ -79,19 +81,55 @@ int main(int argc, char *argv[])
             << s.getRadius() << " : " << s.getColor().getR() << " : " << s.getColor().getG() << " : " << s.getColor().getB() << "\n";
     }
     cout << endl;
-    //end Test Scene*/
+    //end Scene Debug
+    */
 
-    //Compute
+    //Image Computations
+    rgb *imgBuf = new rgb[imgHeight*imgWidth];//apparently allocating multidimensional arrays is frustrating
+    double aspect = imgWidth/imgHeight;
 
-    //Buffer
+    //Viewing Window Compuatations
+    vector3 u = viewdir.crossProduct(updir); //Find the vector horizontal to the window
+    u = u.unit();
+    vector3 nviewdir = viewdir.unit();
+    vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
+    //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written!
+    double viewWidth = 2*tan(fovh/2);
+    double viewHeight = viewWidth/aspect;
+    point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point ur = (eye.vect() + nviewdir + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
+    point ll = (eye.vect() + nviewdir - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
+    vector3 deltah = ll.subtract(ul).scale(1/(imgHeight-1));
+    vector3 deltav = ur.subtract(ul).scale(1/(imgWidth-1));
 
-    //Loop
+    //Raycast/trace loop
+    for(int y = 0; y < imgHeight; y++)//for each pixel in image
+    {
+        for(int x = 0; x < imgWidth; x++)
+        {
+            imgBuf[y*imgWidth+x] = bkgcolor;//initialize to background
+            sphere *closest = nullptr;
+            double closestInter = numeric_limits<double>::infinity();
+            ray curRay(eye,ul.vect()+deltah.scale(x)+deltav.scale(y));//construct ray
+            for(sphere sph : spheres)//for each sphere (object) in scene
+            {
+                double t;
+                if(sph.intersect(curRay,t) && closestInter > t)//returns true if intersected, assigns closer (non-neg) intersection to t
+                {
+                    closestInter = t;
+                    closest = &sph;
+                }
+            }
+            if (closest!=nullptr)
+                imgBuf[y*imgWidth+x] = closest->getColor();//TODO: replace getColor() with Sphere::shadeRay(curRay,closestInter)
+        }
+    }
 
     //CreateOutFileHeader
     fileName = fileName.replace(fileName.length()-4,fileName.length()-1,".ppm");//change extension from .txt to .ppm
     fileName = "/" + fileName; //For removing the path safely
     fileName = fileName.replace(0,fileName.find_last_of('/')+1,"");//remove path
-    cout << fileName << endl;
     ofstream outFile(fileName, ofstream::trunc);
     outFile << "P3\n# Created By Dalton H.\n";
     outFile << imgWidth << " " << imgHeight << "\n";
@@ -118,6 +156,7 @@ int main(int argc, char *argv[])
         }
     }
     outFile.close();
+    delete[] imgBuf;
 
     return 0;
 }
