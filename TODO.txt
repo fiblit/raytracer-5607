@@ -1,10 +1,8 @@
-Fix bugs (Fix deltah & deltav equaling (0,0,0))
+Fix bugs (Distortion?)
 
 Update README.txt
 
 Draw scenes
-
-Fault/Error testing
 
 And everything else!
 

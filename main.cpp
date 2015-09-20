@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
 
     //Read Scene
     int errval;
-    int imgWidth, imgHeight;//actually shouldn't they all be const?
     point eye;
     vector3 viewdir, updir;
+    int imgWidth, imgHeight;
     double fovh;
     rgb bkgcolor;
     vector<sphere> spheres;//Might be later changed to "objects"
@@ -91,13 +91,15 @@ int main(int argc, char *argv[])
 
     //Viewing Window Compuatations
     vector3 u = viewdir.crossProduct(updir); //Find the vector horizontal to the window
+    if (u.length() == 0)//viewdir and updir were parallel
+        return errMsg(INVPRM,"viewdir and updir are parallel. Please offset updir");
     u = u.unit();
     vector3 nviewdir = viewdir.unit();
     vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
     //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written!
-    double viewWidth = 2*tan(fovh/2*PI/180);//TODO: <- tan takes radians not degrees
+    double viewWidth = 2*tan(fovh/2*PI/180);
     double viewHeight = viewWidth/aspect;
-    point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();//TODO: image stil seems off-center
+    point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point ur = (eye.vect() + nviewdir + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
     point ll = (eye.vect() + nviewdir - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
@@ -115,7 +117,6 @@ int main(int argc, char *argv[])
             ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
             for(int i = 0; i < spheres.size(); i++)//for each sphere (object) in scene
             {
-                sphere sph = spheres[i];
                 double t;
                 if(spheres[i].intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
@@ -124,7 +125,7 @@ int main(int argc, char *argv[])
                 }
             }
             if (closest!=-1)
-                imgBuf[y*imgWidth+x] = spheres[closest].getColor();//TODO: replace getColor() with Sphere::shadeRay(curRay,closestInter)
+                imgBuf[y*imgWidth+x] = spheres[closest].shadeRay(curRay,closestInter);
         }
     }
 
@@ -236,7 +237,7 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'eye x y z\' @ Line number: " + to_string(lineNum));
             }
         }
         else if (keyword == "viewdir")
@@ -251,8 +252,11 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'viewdir x y z\' @ Line number: " + to_string(lineNum));
             }
+
+            if (viewdir.getX() == 0 && viewdir.getY() == 0 && viewdir.getZ() == 0) //validate value
+                return errMsg(INVPRM,"viewdir is the zero vector @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "updir")
         {
@@ -266,8 +270,11 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'updir x y z\' @ Line number: " + to_string(lineNum));
             }
+
+            if (updir.getX() == 0 && updir.getY() == 0 && updir.getZ() == 0) //validate value
+                return errMsg(INVPRM,"updir is the zero vector @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "fovh")
         {
@@ -281,9 +288,11 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'fovh v\' @ Line number: " + to_string(lineNum));
             }
-            //TODO: validate range
+
+            if (fovh >=180 || fovh <= 0) //validate value
+                return errMsg(INVPRM,"fovh is out of range (0,180) @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "imsize")
         {
@@ -298,8 +307,13 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'imsize h w\' @ Line number: " + to_string(lineNum));
             }
+
+            if (width <= 0)
+                return errMsg(INVPRM,"imsize width is out of range (0,inf) @ Line number: " + to_string(lineNum));
+            if (height <= 0)
+                return errMsg(INVPRM,"imsize height is out of range (0,inf) @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "bkgcolor")
         {
@@ -313,8 +327,15 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'bkgcolor r g b\' @ Line number: " + to_string(lineNum));
             }
+
+            if (bkgcolor.getR() > 1.0 || bkgcolor.getR() < 0.0)
+                return errMsg(INVPRM,"bkgcolor red is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (bkgcolor.getG() > 1.0 || bkgcolor.getG() < 0.0)
+                return errMsg(INVPRM,"bkgcolor green is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (bkgcolor.getB() > 1.0 || bkgcolor.getB() < 0.0)
+                return errMsg(INVPRM,"bkgcolor blue is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "mtlcolor")
         {
@@ -323,12 +344,18 @@ int getInFileData(
                 double *params = getDoubleParams(3,inFileLine);//might throw
                 mtlcolor = rgb(params[0],params[1],params[2]);
                 kwdIsDef[MTLCOLOR] = true;
-
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'mtlcolor r g b\' @ Line number: " + to_string(lineNum));
             }
+
+            if (mtlcolor.getR() > 1.0 || mtlcolor.getR() < 0.0)
+                return errMsg(INVPRM,"mtlcolor red is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getG() > 1.0 || mtlcolor.getG() < 0.0)
+                return errMsg(INVPRM,"mtlcolor green is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getB() > 1.0 || mtlcolor.getB() < 0.0)
+                return errMsg(INVPRM,"mtlcolor blue is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "sphere")
         {
@@ -342,18 +369,27 @@ int getInFileData(
             }
             catch(errNum e)
             {
-                return errMsg(e,"Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'sphere x y z r\' @ Line number: " + to_string(lineNum));
             }
+            if (spheres[spheres.size()-1].getRadius() <= 0)
+                return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
+
         }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line
         else //unknown keyword
-            return errMsg(INVKWD,"Line number: " + to_string(lineNum));
+            return errMsg(INVKWD,"Unknown Keyword @ Line number: " + to_string(lineNum));
 
         //Read next line
         getline(inFile,inFileLine);
         lineNum++;
     }
+    //check that the viewing params have been defined
+    string kwdString[6] = {"eye","viewdir","updir","fovh","imsize","bkgcolor"};
+    for (int i = 0; i <= BKGCOLOR ; i++)
+        if(!kwdIsDef[i])
+            return errMsg(MSSKWD,"Please define " + kwdString[i]);
+
     inFile.close();
     return 0;
 }
