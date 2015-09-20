@@ -29,6 +29,7 @@ int getInFileData(ifstream &inFile,
     vector<sphere> &spheres);
 int* getIntParams(int n, string line);//helper function for above
 double* getDoubleParams(int n, string line);//helper for above
+double const PI = 3.14159265358979323846264338327950288;
 
 int main(int argc, char *argv[])
 {
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
     if ((errval = getInFileData(inFile, imgWidth, imgHeight, eye, viewdir, updir, fovh, bkgcolor, spheres)))
         return errval;
 
-
+    /*
     //Scene Debug
     cout << "width: " << imgWidth << "\n";
     cout << "height: " << imgHeight << "\n";
@@ -82,17 +83,6 @@ int main(int argc, char *argv[])
     }
     cout << endl;
     //end Scene Debug
-    /*
-    //.unit() Debug
-    vector3 test(3.0,4.0,5.0);
-    cout << test.getX() << endl;
-    cout << test.getY() << endl;
-    cout << test.getZ() << endl;
-    cout << test.scale(2.0).getX() << endl;
-    cout << test.unit().getX() <<" "<< test.unit().getY() <<" "<< test.unit().getZ() << endl;
-    cout << test.unit().length() << endl;
-    return 0;
-    //end Debug
     */
 
     //Image Computations
@@ -105,14 +95,14 @@ int main(int argc, char *argv[])
     vector3 nviewdir = viewdir.unit();
     vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
     //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written!
-    double viewWidth = 2*tan(fovh/2);
+    double viewWidth = 2*tan(fovh/2*PI/180);//TODO: <- tan takes radians not degrees
     double viewHeight = viewWidth/aspect;
-    point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();//TODO: image stil seems off-center
     point ur = (eye.vect() + nviewdir + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
     point ll = (eye.vect() + nviewdir - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
-    vector3 deltah = ll.subtract(ul).fscale(imgHeight-1);
-    vector3 deltav = ur.subtract(ul).fscale(imgWidth-1);//TODO: Fix deltah & deltav equaling (0,0,0)
+    vector3 deltav = ll.subtract(ul).fscale(imgHeight-1);
+    vector3 deltah = ur.subtract(ul).fscale(imgWidth-1);
 
     //Raycast/trace loop
     for(int y = 0; y < imgHeight; y++)//for each pixel in image
@@ -125,6 +115,7 @@ int main(int argc, char *argv[])
             ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
             for(int i = 0; i < spheres.size(); i++)//for each sphere (object) in scene
             {
+                sphere sph = spheres[i];
                 double t;
                 if(spheres[i].intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
@@ -133,10 +124,7 @@ int main(int argc, char *argv[])
                 }
             }
             if (closest!=-1)
-            {
-                sphere sph = spheres[closest];
                 imgBuf[y*imgWidth+x] = spheres[closest].getColor();//TODO: replace getColor() with Sphere::shadeRay(curRay,closestInter)
-            }
         }
     }
 
@@ -154,7 +142,7 @@ int main(int argc, char *argv[])
     {
         for (int x = 0; x < imgWidth; x++)
         {
-            outFile << 255*imgBuf[y*imgWidth+x].getR() << " " << 255*imgBuf[y*imgWidth+x].getG() << " " << 255*imgBuf[y*imgWidth+x].getB();
+            outFile << (int)ceil(255*imgBuf[y*imgWidth+x].getR()) << " " << (int)ceil(255*imgBuf[y*imgWidth+x].getG()) << " " << (int)ceil(255*imgBuf[y*imgWidth+x].getB());
             if (i==4)
             {
                 i=0;
@@ -233,7 +221,6 @@ int getInFileData(
         //determine keyword
         string keyword;
         keyword = getWord(inFileLine);
-
 
         //validate/perform keyword
         string param;

@@ -12,12 +12,12 @@ point::point(double x, double y, double z)
 //vect is shorthand for subtracting origin.
 vector3 point::vect()
 {
-	return vector3(this->x, this->y, this->z);
+    return vector3(this->x, this->y, this->z);
 }
 
 vector3 point::subtract(point p)
 {
-	return vector3(this->x - p.getX(), this->y - p.getY(), this->z - p.getZ());
+    return vector3(this->x - p.getX(), this->y - p.getY(), this->z - p.getZ());
 }
 
 void point::setX(double x)

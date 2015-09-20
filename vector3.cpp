@@ -5,7 +5,7 @@ using namespace std;
 
 vector3::vector3() {}
 
-vector3::vector3(int x, int y, int z)
+vector3::vector3(double x, double y, double z)
 {
     this->x = x;
     this->y = y;
@@ -31,33 +31,17 @@ double vector3::length()
 
 vector3 vector3::scale(double s)
 {
-    vector3 ret;
-    ret.setVec(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
-    return ret;
-    //return vector3(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
-}
-
-vector3 vector3::scaler(double s, vector3 u)
-{
-    vector3 ret;
-    ret.setVec(s*(u.getX()), s*(u.getY()), s*(u.getZ()));
-    return ret;
-    //return vector3(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
+    return vector3(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
 }
 
 vector3 vector3::fscale(double s)
 {
-    vector3 ret;
-    ret.setVec((this->getX())/s, (this->getY())/s, (this->getZ())/s);
-    return ret;
-    //return vector3((this->getX())/s, (this->getY())/s, (this->getZ())/s);
+    return vector3((this->getX())/s, (this->getY())/s, (this->getZ())/s);
 }
 
 vector3 vector3::add(vector3 v)
 {
-    vector3 ret;
-    ret.setVec(this->getX()+v.getX(), this->getY()+v.getY(), this->getZ()+v.getZ());
-    return ret;
+    return vector3(this->getX()+v.getX(), this->getY()+v.getY(), this->getZ()+v.getZ());
 }
 
 vector3 vector3::operator+(const vector3 &u)
@@ -71,13 +55,9 @@ vector3 vector3::operator-(const vector3 &u)
     return this->add(ut.scale(-1));
 }
 
-vector3 vector3::unit()//TODO: Fix??
+vector3 vector3::unit()
 {
-    double l = 1/(this->length());
-    vector3 ret;
-    ret.setVec(l*(this->getX()), l*(this->getY()), l*(this->getZ()));
-    return ret;
-    //return (this->scale(1/(this->length())));
+    return this->fscale(this->length());
 }
 
 point vector3::toPoint()
