@@ -41,6 +41,11 @@ bool sphere::intersect(ray rr, double &t)
     return true; //intersection at t
 }
 
+rgb sphere::shadeRay(ray rr, double t)
+{
+    return this->getColor();
+}
+
 rgb sphere::getColor()
 {
     return color;

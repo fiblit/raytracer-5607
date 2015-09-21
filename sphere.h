@@ -14,6 +14,7 @@ class sphere
         sphere();
         sphere(point loc, double radius, rgb color);
         bool intersect(ray rr, double &t);
+        rgb shadeRay(ray rr, double t);
         rgb getColor();
         void setColor(rgb color);
         point getLoc();
