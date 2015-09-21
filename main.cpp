@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
             for(int i = 0; i < spheres.size(); i++)//for each sphere (object) in scene
             {
                 double t;
+                sphere sph = spheres[i];
                 if(spheres[i].intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
                     closestInter = t;
