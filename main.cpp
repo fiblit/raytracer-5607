@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
     //Image Computations
     rgb *imgBuf = new rgb[imgHeight*imgWidth];//apparently allocating multidimensional arrays is frustrating
-    double aspect = imgWidth/imgHeight;
+    double aspect = ((double)imgWidth)/imgHeight;//cast to double because they are ints
 
     //Viewing Window Compuatations
     vector3 u = viewdir.crossProduct(updir); //Find the vector horizontal to the window
