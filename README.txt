@@ -1,13 +1,11 @@
 # Made by Dalton Hildreth, 5117575 #
 
-This program will generate an (interesting) ASCII ppm image of variable width and height as determined by an input file.
+OS: Ubunutu 14.04 LTS 
+🐧 (<- this is a penguin in unicode, if you can't see it.)
 
-The program will start by prompting for the input file's name. Please include ".txt" at the end of the name for the program to function. For example you could enter "myfile.txt" and the program would attempt to process it, but if you input "myfile" it will give you an error message and exit. If the file doesn't exist, give you an error message and exit.
+Compile:
+Run "make raytrace" (or just "make" apparently) in the local directory. It will place the "raytrace" executable in a bin directory, and the *.o files in an obj directory.
 
-Once the file is deemed to exist, the program will check if the contents are properly formatted. The first line of the input file should contain the following: "imsize <width> <height>". Where the items in brackets represent integer parameters.  Anything past this information will be ignored. If the header is incorrect in any way, the program will give you the proper error message and exit.
-
-The program will then create the proper header for an ASCII ppm file, which is titled the same as the input file. (With the .ppm instead .txt extension, of course)
-
-It will then fill the contents of the ASCII ppm file. If opened with GIMP, or a similar image processing program, the image should look like a color spectrum, with red on the y axis, and blue on the x axis. (Green is set to one intensity (128/255) throughout.)
-
+How to Run:
+You can call the program in one of two ways. You can simply call it via "./raytrace" or "raytrace" (depending on your $PATH settings). If you do, the program terminal will prompt you for the input file name. You can also call it via "./raytrace <path_to_scenefile>" or "raytrace <path_to_scenefile>" (Again depends on your $PATH, just do the first for a gaurentee). The <path_to_scenefile> parameter does not require the "./" unlike the program executable.
 

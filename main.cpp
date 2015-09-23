@@ -86,7 +86,9 @@ int main(int argc, char *argv[])
     */
 
     //Image Computations
-    rgb *imgBuf = new rgb[imgHeight*imgWidth];//apparently allocating multidimensional arrays is frustrating
+    //imgBuf is still a 2D *image*, it is just a 1D array. This was more for my convenience than anything else.
+    //I'll fix it in hw 1b (If I need to) once I understand the syntax of dynamically allocating multi-dimensional arrays in C++.
+    rgb *imgBuf = new rgb[imgHeight*imgWidth];//apparently allocating multidimensional arrays is frustrating(confusing,strange,stupid).
     double aspect = ((double)imgWidth)/imgHeight;//cast to double because they are ints
 
     //Viewing Window Compuatations
@@ -96,13 +98,13 @@ int main(int argc, char *argv[])
     u = u.unit();
     vector3 nviewdir = viewdir.unit();
     vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
-    //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written!
+    //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written, since it is only used in multiplications!
     double viewWidth = 2*tan(fovh/2*PI/180);
     double viewHeight = viewWidth/aspect;
     point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point ur = (eye.vect() + nviewdir + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
     point ll = (eye.vect() + nviewdir - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
-    point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
+    point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();//unused
     vector3 deltav = ll.subtract(ul).fscale(imgHeight-1);
     vector3 deltah = ur.subtract(ul).fscale(imgWidth-1);
 
@@ -115,10 +117,9 @@ int main(int argc, char *argv[])
             int closest = -1;
             double closestInter = numeric_limits<double>::infinity();
             ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            for(int i = 0; i < spheres.size(); i++)//for each sphere (object) in scene
+            for(int i = 0; i < (int)spheres.size(); i++)//for each sphere (object) in scene
             {
                 double t;
-                sphere sph = spheres[i];
                 if(spheres[i].intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
                     closestInter = t;
@@ -130,7 +131,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //CreateOutFileHeader
+    //Create Output File & Header
     fileName = fileName.replace(fileName.length()-4,fileName.length()-1,".ppm");//change extension from .txt to .ppm
     fileName = "/" + fileName; //For removing the path safely
     fileName = fileName.replace(0,fileName.find_last_of('/')+1,"");//remove path
@@ -189,7 +190,7 @@ int errMsg(int err, string msg="")
         case REPKWD:
             cout << "ERROR 7: Repeated Keyword";
             break;
-        default:
+        default://This should never happen. (Unless I'm lazy)
             cout << "ERROR ?: There was an undefined error";
             break;
     }
@@ -197,6 +198,10 @@ int errMsg(int err, string msg="")
     return err;
 }
 
+/*
+Reads all of the data from inFile into the other parameters.
+Also, does some validation on the data. (e.g. type checking, range checking)
+*/
 int getInFileData(
     ifstream &inFile,
     int &width,
@@ -395,10 +400,10 @@ int getInFileData(
     return 0;
 }
 
-/* helper function for getInFileData */
+// helper function for getInFileData
 int* getIntParams(int n, string line)
 {
-    int * params = new int [n];
+    int *params = new int [n];
     string param;
     for (int i = 0; i < n; i++)
     {
@@ -412,10 +417,10 @@ int* getIntParams(int n, string line)
     return params;
 }
 
-/* helper function for getInFileData */
+// helper function for getInFileData
 double* getDoubleParams(int n, string line)
 {
-    double * params = new double [n];
+    double *params = new double [n];
     string param;
     for (int i = 0; i < n; i++)
     {
@@ -456,6 +461,7 @@ bool isInt(string str)
     return true;
 }
 
+//Determines if a string is a valid double
 bool isDouble(string str)
 {
     if (str.length()<1 || (str[0]!='-' && str[0]!='+' && !isdigit(str[0])))
