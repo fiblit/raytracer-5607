@@ -1,13 +1,4 @@
-Fix bugs (Distortion?)
-
-Update README.txt
-
 Draw scenes
 
 And everything else!
-
-
-
-Restructure Workplace to allow Code::blocks/git to freely interact with the Repository. <- I tried using symbolic links! Code::Blocks killed them!
-Begin to try and stop using the IDE.
 

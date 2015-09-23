@@ -34,6 +34,10 @@ vector3 vector3::scale(double s)
     return vector3(s*(this->getX()), s*(this->getY()), s*(this->getZ()));
 }
 
+//This function may seem redundant, but I have it for two (three) reasons.
+//One it was a fix to a symptom of a bug, (I fixed the root of the bug).
+//Two it *may* help with numerical error. ((1/big#2)*big#1 might be 0, but big#1/big#2 might be some#, instead of 0)
+//Three it is due for deprecation, I just will be doing that in homework 1b XD
 vector3 vector3::fscale(double s)
 {
     return vector3((this->getX())/s, (this->getY())/s, (this->getZ())/s);
