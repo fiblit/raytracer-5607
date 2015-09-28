@@ -1,4 +1,9 @@
-Draw scenes
+Add material class and functionality
+Implement material (in particular, into object/sphere)
+Add phong illumination model to shadeRay
+Add light class
+Shadow stuff???
+Do cylinder intersection math
+Add cylinder class
 
-And everything else!
-
+And, of course, everything else!
