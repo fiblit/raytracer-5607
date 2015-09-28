@@ -1,5 +1,5 @@
 raytrace: main.o vector3.o point.o ray.o sphere.o rgb.o bin/ obj/
-	g++ -o bin/raytrace obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o
+	g++ -o bin/raytrace obj/*.o
 
 main.o: main.cpp obj/
 	g++ -std=c++11 -c main.cpp -o obj/main.o
@@ -13,6 +13,9 @@ sphere.o: sphere.cpp sphere.h obj/
 	g++ -std=c++11 -c sphere.cpp -o obj/sphere.o
 rgb.o: rgb.cpp rgb.h obj/
 	g++ -std=c++11 -c rgb.cpp -o obj/rgb.o
+IO.o: IO.cpp IO.h obj/
+	g++ -std=c++11 -c IO.cpp -o obj/IO.o
+
 obj/:
 	mkdir obj
 bin/:
