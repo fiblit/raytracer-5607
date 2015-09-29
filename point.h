@@ -16,7 +16,6 @@ class point
 		double getX();
 		double getY();
 		double getZ();
-    protected:
     private:
 		double x;
 		double y;
