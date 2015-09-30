@@ -1,5 +1,3 @@
-Implement material (in particular, into object/sphere)
-  -Fix n being accepted as a double in IO
 Add phong illumination model to shadeRay
 Add light class
 Shadow stuff???

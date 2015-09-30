@@ -12,7 +12,7 @@
 
 using namespace std;
 
-string getWord(string& line);
+string getWord(string &line);
 bool isInt(string str);
 bool isDouble(string str);
 int errMsg(int err, string msg);
@@ -29,8 +29,8 @@ typedef struct fileData
     vector<sphere> *spheres;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);
-int* getIntParams(int n, string line);//helper function for above
-double* getDoubleParams(int n, string line);//helper for above
+int* getIntParams(int n, string &line);//helper function for above
+double* getDoubleParams(int n, string &line);//helper for above
 void writeOutFile(string fileName, rgb *imgBuf, int imgWidth, int imgHeight);
 
 #endif // IO_H
