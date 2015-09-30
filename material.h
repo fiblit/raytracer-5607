@@ -6,25 +6,27 @@
 class material
 {
 	public:
+        material();
+        material(rgb Od, rgb Os, double ka, double kd, double ks, int n);
 		rgb getOd();
 		rgb getOs();
-		int getka();
-		int getkd();
-		int getks();
+		double getka();
+		double getkd();
+		double getks();
 		int getn();
 		void setOd(rgb Od);
 		void setOs(rgb Os);
-		void setka(int ka);
-		void setkd(int ks);
-		void setks(int ks);
+		void setka(double ka);
+		void setkd(double kd);
+		void setks(double ks);
 		void setn(int n);
 	private:
 		rgb Od;
 		rgb Os;
-		int ka;
-		int kd;
-		int ks;
+		double ka;
+		double kd;
+		double ks;
 		int n;
-}
+};
 
 #endif
