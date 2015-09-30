@@ -176,13 +176,14 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         {
             try
             {
-                double *params = getDoubleParams(10,inFileLine);//might throw
-                mtlcolor = material(rgb(params[0],params[1],params[2]), rgb(params[3],params[4],params[5]), params[6], params[7], params[8], (int)params[9]);
+                double *params = getDoubleParams(9, inFileLine);//might throw
+                int *paramsI = getIntParams(1, inFileLine);//Since n should be int, not double.
+                mtlcolor = material(rgb(params[0],params[1],params[2]), rgb(params[3],params[4],params[5]), params[6], params[7], params[8], paramsI[0]);
                 kwdIsDef[MTLCOLOR] = true;
             }
             catch(errNum e)
             {
-                return errMsg(e,"Usage \'mtlcolor r g b\' @ Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'mtlcolor Dr Dg Db Sr Sg Sb ka kd ks n\' @ Line number: " + to_string(lineNum));
             }
 
             if (mtlcolor.getOd().getR() > 1.0 || mtlcolor.getOd().getR() < 0.0)
@@ -230,7 +231,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 }
 
 // helper function for getInFileData
-int* getIntParams(int n, string line)
+int* getIntParams(int n, string &line)
 {
     int *params = new int [n];
     string param;
@@ -247,7 +248,7 @@ int* getIntParams(int n, string line)
 }
 
 // helper function for getInFileData
-double* getDoubleParams(int n, string line)
+double* getDoubleParams(int n, string &line)
 {
     double *params = new double [n];
     string param;
@@ -296,7 +297,7 @@ void writeOutFile(string fileName, rgb *imgBuf, int imgWidth, int imgHeight)
 }
 
 //Gets the next sequence of chars in the string line. The words are delimitated by whitespace. Updates line accordingly.
-string getWord(string& line) //So it turns out that C++ already has a way to do this. :/ (file/line >> word)
+string getWord(string &line) //So it turns out that C++ already has a way to do this. :/ (file/line >> word)
 {
     string word = "";
     int i;
