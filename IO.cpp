@@ -48,7 +48,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
     int lineNum = 1;
 
     //read data
-    rgb mtlcolor;
+    material mtlcolor;
     bool kwdIsDef [7] = {false, false, false, false, false, false, false};//we shouldn't see most keywords twice
         //we also should see mtlcolor before the first sphere
     enum kwd {EYE,VIEWDIR,UPDIR,FOVH,IMSIZE,BKGCOLOR,MTLCOLOR};//we don't need to know about sphere being defined
@@ -176,8 +176,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         {
             try
             {
-                double *params = getDoubleParams(3,inFileLine);//might throw
-                mtlcolor = rgb(params[0],params[1],params[2]);
+                double *params = getDoubleParams(10,inFileLine);//might throw
+                mtlcolor = material(rgb(params[0],params[1],params[2]), rgb(params[3],params[4],params[5]), params[6], params[7], params[8], (int)params[9]);
                 kwdIsDef[MTLCOLOR] = true;
             }
             catch(errNum e)
@@ -185,12 +185,12 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e,"Usage \'mtlcolor r g b\' @ Line number: " + to_string(lineNum));
             }
 
-            if (mtlcolor.getR() > 1.0 || mtlcolor.getR() < 0.0)
-                return errMsg(INVPRM,"mtlcolor red is out of range [0,1] @ Line number: " + to_string(lineNum));
-            if (mtlcolor.getG() > 1.0 || mtlcolor.getG() < 0.0)
-                return errMsg(INVPRM,"mtlcolor green is out of range [0,1] @ Line number: " + to_string(lineNum));
-            if (mtlcolor.getB() > 1.0 || mtlcolor.getB() < 0.0)
-                return errMsg(INVPRM,"mtlcolor blue is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getOd().getR() > 1.0 || mtlcolor.getOd().getR() < 0.0)
+                return errMsg(INVPRM,"mtlcolor diffuse red is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getOd().getG() > 1.0 || mtlcolor.getOd().getG() < 0.0)
+                return errMsg(INVPRM,"mtlcolor diffuse green is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getOd().getB() > 1.0 || mtlcolor.getOd().getB() < 0.0)
+                return errMsg(INVPRM,"mtlcolor diffuse blue is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "sphere")
         {

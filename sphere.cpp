@@ -2,11 +2,11 @@
 
 sphere::sphere() {}
 
-sphere::sphere(point loc, double radius, rgb color)
+sphere::sphere(point loc, double radius, material mtl)
 {
     this->loc = loc;
     this->radius = radius;
-    this->color = color;
+    this->mtl = mtl;
 }
 
 //Determines if the ray rr intersects this sphere.
@@ -45,17 +45,17 @@ bool sphere::intersect(ray rr, double &t)
 
 rgb sphere::shadeRay(ray rr, double t)
 {
-    return this->getColor();
+    return this->getMaterial().getOd();
 }
 
-rgb sphere::getColor()
+material sphere::getMaterial()
 {
-    return color;
+    return mtl;
 }
 
-void sphere::setColor(rgb color)
+void sphere::setMaterial(material mtl)
 {
-    this->color = color;
+    this->mtl = mtl;
 }
 
 point sphere::getLoc()
