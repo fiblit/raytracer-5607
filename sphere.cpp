@@ -43,17 +43,56 @@ bool sphere::intersect(ray rr, double &t)
     return true; //intersection at t
 }
 
-rgb sphere::shadeRay(ray rr, double t)
+#include <iostream>
+
+rgb sphere::shadeRay(ray rr, double t, vector<light> lights)
 {
-    return this->getMaterial().getOd();
+    /*
+    I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
+    */
+    rgb color = mtl.getOd() * mtl.getka();
+    point inter = rr.getLoc() + rr.getDir() * t;
+    vector3 n = (inter.subtract(loc)).fscale(radius);
+    vector3 v = rr.getDir() * (-1);//TO the viewer
+    //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
+    for (light lit : lights)
+    {
+        vector3 l;
+        if (lit.getIsDir())
+            l = lit.getLoc();//TO the light
+        else
+            l = lit.getLoc().toPoint().subtract(inter);
+        l = l.unit();
+        vector3 h = l + v;
+        h = h.unit();
+        color = color + lit.getColor() * (mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())));
+
+        if (color.getR() > 1.0)
+            color.setR(1.0);
+        if (color.getG() > 1.0)
+            color.setG(1.0);
+        if (color.getB() > 1.0)
+            color.setB(1.0);
+        //cout << "\nlight";
+        //cout << "n: " << n.getX() << " : " << n.getY() << " : " << n.getZ() << endl;
+        //cout << "v: " << v.getX() << " : " << v.getY() << " : " << v.getZ() << endl;
+        //cout << "l: " << l.getX() << " : " << l.getY() << " : " << l.getZ() << endl;
+        //cout << "h: " << h.getX() << " : " << h.getY() << " : " << h.getZ() << endl;
+        //rgb d = (mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l))));
+        //rgb s = (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())));
+        //cout << "d: " << d.getR() << " : " << d.getG() << " : " << d.getB() << endl;
+        //cout << "s: " << s.getR() << " : " << s.getG() << " : " << s.getB() << endl;
+    }
+
+    return color;
 }
 
-material sphere::getMaterial()
+material sphere::getMtl()
 {
     return mtl;
 }
 
-void sphere::setMaterial(material mtl)
+void sphere::setMtl(material mtl)
 {
     this->mtl = mtl;
 }

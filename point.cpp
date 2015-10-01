@@ -48,3 +48,8 @@ double point::getZ()
 {
 	return z;
 }
+
+point point::operator+(const vector3 &u)
+{
+    return point(x + u.getX(), y + u.getY(), z + u.getZ());
+}

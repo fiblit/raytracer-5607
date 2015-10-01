@@ -30,17 +30,32 @@ void rgb::setB(double b)
     this->b = b;
 }
 
-double rgb::getR()
+double rgb::getR() const
 {
     return r;
 }
 
-double rgb::getG()
+double rgb::getG() const
 {
     return g;
 }
 
-double rgb::getB()
+double rgb::getB() const
 {
     return b;
+}
+
+rgb rgb::operator* (const double &s)
+{
+    return rgb(r * s, g * s, b * s);
+}
+
+rgb rgb::operator* (const rgb &c)
+{
+    return rgb(r * c.getR(), g * c.getG(), b * c.getB());
+}
+
+rgb rgb::operator+ (const rgb &c)
+{
+    return rgb(r + c.getR(), g + c.getG(), b + c.getB());
 }

@@ -1,11 +1,13 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include <vector>
+#include <cmath>
 #include "material.h"
 #include "rgb.h"
 #include "point.h"
 #include "ray.h"
-#include <cmath>
+#include "light.h"
 
 using namespace std;
 
@@ -15,9 +17,9 @@ class sphere
         sphere();
         sphere(point loc, double radius, material mtl);
         bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t);
-        material getMaterial();
-        void setMaterial(material mtl);
+        rgb shadeRay(ray rr, double t, vector<light> lights);
+        material getMtl();
+        void setMtl(material mtl);
         point getLoc();
         void setLoc(point p);
         double getRadius();
