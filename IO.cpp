@@ -192,6 +192,12 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(INVPRM,"mtlcolor diffuse green is out of range [0,1] @ Line number: " + to_string(lineNum));
             if (mtlcolor.getOd().getB() > 1.0 || mtlcolor.getOd().getB() < 0.0)
                 return errMsg(INVPRM,"mtlcolor diffuse blue is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getOs().getR() > 1.0 || mtlcolor.getOs().getR() < 0.0)
+                return errMsg(INVPRM,"mtlcolor specular red is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getOs().getG() > 1.0 || mtlcolor.getOs().getG() < 0.0)
+                return errMsg(INVPRM,"mtlcolor specular green is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (mtlcolor.getOs().getB() > 1.0 || mtlcolor.getOs().getB() < 0.0)
+                return errMsg(INVPRM,"mtlcolor specular blue is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "sphere")
         {
@@ -210,6 +216,30 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             if ((*fd.spheres)[(*fd.spheres).size()-1].getRadius() <= 0)
                 return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
 
+        }
+        else if (keyword == "light")
+        {
+            rgb color;
+            try
+            {
+                double *paramsLoc = getDoubleParams(3,inFileLine);//the getParams might throw
+                int *paramsDir = getIntParams(1,inFileLine);
+                double *paramsRGB = getDoubleParams(3,inFileLine);
+                vector3 loc(paramsLoc[0], paramsLoc[1], paramsLoc[2]);
+                color = rgb(paramsRGB[0], paramsRGB[1], paramsRGB[2]);
+                (*fd.lights).push_back (light(loc, (bool)paramsDir[0], color));
+            }
+            catch(errNum e)
+            {
+                return errMsg(e,"Usage \'light x y z w r g b\' @ Line number: " + to_string(lineNum));
+            }
+
+            if (color.getR() > 1.0 || color.getR() < 0.0)
+                return errMsg(INVPRM,"light red is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (color.getG() > 1.0 || color.getG() < 0.0)
+                return errMsg(INVPRM,"light green is out of range [0,1] @ Line number: " + to_string(lineNum));
+            if (color.getB() > 1.0 || color.getB() < 0.0)
+                return errMsg(INVPRM,"light blue is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line

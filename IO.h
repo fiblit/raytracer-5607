@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "vector3.h"
 #include "rgb.h"
+#include "light.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ typedef struct fileData
     double *fovh;
     rgb *bkgcolor;
     vector<sphere> *spheres;
+    vector<light> *lights;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);
 int* getIntParams(int n, string &line);//helper function for above

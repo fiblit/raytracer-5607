@@ -49,16 +49,18 @@ int main(int argc, char *argv[])
     double fovh;
     rgb bkgcolor;
     vector<sphere> spheres;//Might be later changed to "objects"
+    vector<light> lights;
     //init fileData
     fileData_t fd;
     fd.eye = &eye;
-    fd.spheres = &spheres;
     fd.viewdir = &viewdir;
     fd.updir = &updir;
     fd.width = &imgWidth;
     fd.height = &imgHeight;
     fd.fovh = &fovh;
     fd.bkgcolor = &bkgcolor;
+    fd.spheres = &spheres;
+    fd.lights= &lights;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
 
@@ -74,7 +76,16 @@ int main(int argc, char *argv[])
     for(sphere s : spheres)
     {
         cout << "sphere: " << s.getLoc().getX() << " : " << s.getLoc().getY() << " : " << s.getLoc().getZ() << " : "
-            << s.getRadius() << " : " << s.getColor().getR() << " : " << s.getColor().getG() << " : " << s.getColor().getB() << "\n";
+            << s.getRadius() << " : "
+            << s.getMaterial().getOd().getR() << " : " << s.getMaterial().getOd().getG() << " : " << s.getMaterial().getOd().getB() << " : "
+            << s.getMaterial().getOs().getR() << " : " << s.getMaterial().getOs().getG() << " : " << s.getMaterial().getOs().getB() << " : "
+            << s.getMaterial().getka() << " : " << s.getMaterial().getkd() << " : " << s.getMaterial().getks() << " : "
+            << s.getMaterial().getn() << "\n";
+    }
+    for(light l : lights)
+    {
+        cout << "light: " << l.getLoc().getX() << " : " << l.getLoc().getY() << " : " << l.getLoc().getZ() << " : "
+            << l.getIsDir() << " : " << l.getColor().getR() << " : " << l.getColor().getG() << " : " << l.getColor().getB() << "\n";
     }
     cout << endl;
     //end Scene Debug
