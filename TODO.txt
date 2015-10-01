@@ -1,10 +1,9 @@
 Add phong illumination model to shadeRay
-Add light class
 Shadow stuff???
 Do cylinder intersection math
 Add cylinder class
 Optional:
-  Change imgBuf to an actual 2D array
-  Change each sphere holding material to a reference to a material table. (too much space)
-
+    Change imgBuf to an actual 2D array
+    Change each sphere holding material to a reference to a material table. (too much space)
+    Data cleanup
 And, of course, everything else!
