@@ -48,6 +48,12 @@ vector3 vector3::add(vector3 v)
     return vector3(this->getX()+v.getX(), this->getY()+v.getY(), this->getZ()+v.getZ());
 }
 
+vector3 vector3::operator*(const double &s)
+{
+    double t = s;//scale takes non-const. (it should be const...)
+    return this->scale(t);
+}
+
 vector3 vector3::operator+(const vector3 &u)
 {
     return this->add(u);
@@ -76,17 +82,17 @@ void vector3::setVec(double x, double y, double z)
     this->z = z;
 }
 
-double vector3::getX()
+double vector3::getX() const
 {
     return x;
 }
 
-double vector3::getY()
+double vector3::getY() const
 {
     return y;
 }
 
-double vector3::getZ()
+double vector3::getZ() const
 {
     return z;
 }

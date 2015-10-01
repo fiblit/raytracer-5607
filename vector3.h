@@ -18,12 +18,13 @@ class vector3
         vector3 scale(double s);
         vector3 fscale(double s);
         vector3 add(vector3 v);
+        vector3 operator* (const double &s);
         vector3 operator+ (const vector3 &u);
         vector3 operator- (const vector3 &u);
         void setVec(double x, double y, double z);
-        double getX();
-        double getY();
-        double getZ();
+        double getX() const;
+        double getY() const;
+        double getZ() const;
     private:
         double x;
         double y;

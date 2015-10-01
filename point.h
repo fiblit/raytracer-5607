@@ -16,6 +16,7 @@ class point
 		double getX();
 		double getY();
 		double getZ();
+		point operator+(const vector3 &u);
     private:
 		double x;
 		double y;

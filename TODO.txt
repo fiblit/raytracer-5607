@@ -1,5 +1,4 @@
-Add phong illumination model to shadeRay
-Shadow stuff???
+Add Shadows
 Do cylinder intersection math
 Add cylinder class
 Optional:

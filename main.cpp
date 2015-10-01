@@ -77,10 +77,10 @@ int main(int argc, char *argv[])
     {
         cout << "sphere: " << s.getLoc().getX() << " : " << s.getLoc().getY() << " : " << s.getLoc().getZ() << " : "
             << s.getRadius() << " : "
-            << s.getMaterial().getOd().getR() << " : " << s.getMaterial().getOd().getG() << " : " << s.getMaterial().getOd().getB() << " : "
-            << s.getMaterial().getOs().getR() << " : " << s.getMaterial().getOs().getG() << " : " << s.getMaterial().getOs().getB() << " : "
-            << s.getMaterial().getka() << " : " << s.getMaterial().getkd() << " : " << s.getMaterial().getks() << " : "
-            << s.getMaterial().getn() << "\n";
+            << s.getMtl().getOd().getR() << " : " << s.getMtl().getOd().getG() << " : " << s.getMtl().getOd().getB() << " : "
+            << s.getMtl().getOs().getR() << " : " << s.getMtl().getOs().getG() << " : " << s.getMtl().getOs().getB() << " : "
+            << s.getMtl().getka() << " : " << s.getMtl().getkd() << " : " << s.getMtl().getks() << " : "
+            << s.getMtl().getn() << "\n";
     }
     for(light l : lights)
     {
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
                 }
             }
             if (closest!=-1)
-                imgBuf[y*imgWidth+x] = spheres[closest].shadeRay(curRay,closestInter);
+                imgBuf[y*imgWidth+x] = spheres[closest].shadeRay(curRay, closestInter, lights);
         }
     }
 
