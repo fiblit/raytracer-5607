@@ -62,7 +62,7 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<sphere> sphe
             l = lit.getLoc() * (-1);//TO the light (right?)
         else
             l = lit.getLoc().toPoint().subtract(inter);
-        l = l.unit();//To the light (not right?)
+        l = l.unit();
         vector3 h = l + v;
         h = h.unit();
 
