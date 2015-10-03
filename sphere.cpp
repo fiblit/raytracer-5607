@@ -59,7 +59,7 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<sphere> sphe
     {
         vector3 l;
         if (lit.getIsDir())
-            l = lit.getLoc();//TO the light (right?)
+            l = lit.getLoc() * (-1);//TO the light (right?)
         else
             l = lit.getLoc().toPoint().subtract(inter);
         l = l.unit();//To the light (not right?)
@@ -75,7 +75,7 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<sphere> sphe
             {
                 if(lit.getIsDir())
                 {
-                    if(tlig > 0) // in front of me for directional
+                    if(tlig > 0.000001) // in front of me for directional
                     {
                         shadow = 0;//then in shadow
                         break;
