@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
                 }
             }
             if (closest!=-1)
-                imgBuf[y*imgWidth+x] = spheres[closest].shadeRay(curRay, closestInter, lights);
+                imgBuf[y*imgWidth+x] = spheres[closest].shadeRay(curRay, closestInter, lights, spheres);
         }
     }
 
