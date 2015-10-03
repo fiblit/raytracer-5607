@@ -17,7 +17,7 @@ class sphere
         sphere();
         sphere(point loc, double radius, material mtl);
         bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t, vector<light> lights);
+        rgb shadeRay(ray rr, double t, vector<light> lights, vector<sphere> spheres);
         material getMtl();
         void setMtl(material mtl);
         point getLoc();

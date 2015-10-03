@@ -45,7 +45,7 @@ bool sphere::intersect(ray rr, double &t)
 
 #include <iostream>
 
-rgb sphere::shadeRay(ray rr, double t, vector<light> lights)
+rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<sphere> spheres)
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
@@ -59,14 +59,41 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights)
     {
         vector3 l;
         if (lit.getIsDir())
-            l = lit.getLoc();//TO the light
+            l = lit.getLoc();//TO the light (right?)
         else
             l = lit.getLoc().toPoint().subtract(inter);
-        l = l.unit();
+        l = l.unit();//To the light (not right?)
         vector3 h = l + v;
         h = h.unit();
-        color = color + lit.getColor() * (mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())));
 
+        int shadow = 1;
+        ray shadowrr(inter, l);
+        for(int i = 0; i < (int)spheres.size(); i++)//for each sphere (object) in scene
+        {
+            double tlig;
+            if(spheres[i].intersect(shadowrr, tlig))//if path to light interesects some sphere
+            {
+                if(lit.getIsDir())
+                {
+                    if(tlig > 0) // in front of me for directional
+                    {
+                        shadow = 0;//then in shadow
+                        break;
+                    }
+                }
+                else
+                {
+                    if (tlig > 0.000001 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
+                    {
+                        shadow = 0;//then in shadow
+                        break;
+                    }
+                }
+            }
+        }
+
+        color = color + lit.getColor() * ((mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())))) * shadow;
+        //parenthesis are right     10   12         32   3         43      4                 5 4321   2         32   3         43      4   5                 6 54          543210
         if (color.getR() > 1.0)
             color.setR(1.0);
         if (color.getG() > 1.0)
