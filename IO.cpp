@@ -219,14 +219,13 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         }
         else if (keyword == "light")
         {
-            rgb color;
             try
             {
                 double *paramsLoc = getDoubleParams(3,inFileLine);//the getParams might throw
                 int *paramsDir = getIntParams(1,inFileLine);
                 double *paramsRGB = getDoubleParams(3,inFileLine);
                 vector3 loc(paramsLoc[0], paramsLoc[1], paramsLoc[2]);
-                color = rgb(paramsRGB[0], paramsRGB[1], paramsRGB[2]);
+                rgb color(paramsRGB[0], paramsRGB[1], paramsRGB[2]);
                 (*fd.lights).push_back (light(loc, (bool)paramsDir[0], color));
             }
             catch(errNum e)
@@ -234,11 +233,14 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e,"Usage \'light x y z w r g b\' @ Line number: " + to_string(lineNum));
             }
 
-            if (color.getR() > 1.0 || color.getR() < 0.0)
+            light l = (*fd.lights)[(*fd.lights).size() - 1];//for convenience
+            if (l.getIsDir() && l.getLoc().getX() == 0 && l.getLoc().getY() == 0 && l.getLoc().getZ() == 0 )
+                return errMsg(INVPRM,"light dir is the zero vector @ Line number: " + to_string(lineNum));
+            if (l.getColor().getR() > 1.0 || l.getColor().getR() < 0.0)
                 return errMsg(INVPRM,"light red is out of range [0,1] @ Line number: " + to_string(lineNum));
-            if (color.getG() > 1.0 || color.getG() < 0.0)
+            if (l.getColor().getG() > 1.0 || l.getColor().getG() < 0.0)
                 return errMsg(INVPRM,"light green is out of range [0,1] @ Line number: " + to_string(lineNum));
-            if (color.getB() > 1.0 || color.getB() < 0.0)
+            if (l.getColor().getB() > 1.0 || l.getColor().getB() < 0.0)
                 return errMsg(INVPRM,"light blue is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
