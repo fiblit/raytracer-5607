@@ -8,13 +8,14 @@
 //#include "vector3.h"
 //#include "point.h"
 #include "sphere.h"
+#include "cylinder.h"
 #include "rgb.h"
 #include "ray.h"
 #include "IO.h"
 
 using namespace std;
 
-double const PI = 3.14159265358979323846264338327950288;
+double const PI = 3.14159265358979323846264338327950288;//I actually know those digits by heart, I have it down to a little rhythm.
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
 	if (argc > 3)
 		return errMsg(INVCALL, (string)"Usage: \'" + (string)argv[0] + (string)" inputfile outputfile\', or \'" +
             (string)argv[0] + (string)" inputfile\', or \'" +
-            (string)argv[0] + (string)"\' and it will prompt for inputfile.");
+            (string)argv[0] + (string)"\' and it will prompt for files.");
 	else if (argc == 3)
 	{
         inFileName = argv[1];
@@ -36,7 +37,9 @@ int main(int argc, char *argv[])
 	else
 	{
 		cout << "Please type the name of an existing .txt file (please include extension): ";
-		getline(cin,inFileName);
+		getline(cin, inFileName);
+		cout << "Output File? (please include ppm extension) Leave blank if you don't care, it will save to the local directory: ";
+		getline(cin, outFileName);
 	}
 
     //Validate inFile
@@ -131,7 +134,7 @@ int main(int argc, char *argv[])
             int closest = -1;
             double closestInter = numeric_limits<double>::infinity();
             ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            for(int i = 0; i < objects.size(); i++)//for each sphere (object) in scene
+            for(int i = 0; i < (int)objects.size(); i++)//for each sphere (object) in scene
             {
                 double t;
                 if(objects[i]->intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t

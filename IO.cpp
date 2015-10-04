@@ -202,7 +202,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         else if (keyword == "sphere")
         {
             if (!kwdIsDef[MTLCOLOR])//To do sphere mtlcolor must have been defined.
-                return errMsg(MSSKWD,"Line number: " + to_string(lineNum));
+                return errMsg(MSSKWD,"Need mtlcolor before this line @ Line number: " + to_string(lineNum));
             try
             {
                 double *params = getDoubleParams(4,inFileLine);//might throw
@@ -246,6 +246,30 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(INVPRM,"light green is out of range [0,1] @ Line number: " + to_string(lineNum));
             if (l.getColor().getB() > 1.0 || l.getColor().getB() < 0.0)
                 return errMsg(INVPRM,"light blue is out of range [0,1] @ Line number: " + to_string(lineNum));
+        }
+        else if (keyword == "cylx" || keyword == "cyly" || keyword == "cylz")
+        {
+            if (!kwdIsDef[MTLCOLOR])//To do cylinder mtlcolor must have been defined.
+                return errMsg(MSSKWD,"Need mtlcolor before this line @ Line number: " + to_string(lineNum));
+            try
+            {
+                double *params = getDoubleParams(3, inFileLine);//might throw
+                cylinder::cylTypes type;
+                if (keyword == "cylx")
+                    type = cylinder::cylTypes::X;
+                else if (keyword == "cyly")
+                    type = cylinder::cylTypes::Y;
+                else
+                    type = cylinder::cylTypes::Z;
+                (*fd.objects).push_back (new cylinder(params[2], params[0], params[1], type, mtlcolor));
+
+                if (params[2] <=0)
+                    return errMsg(INVPRM,"cylinder radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
+            }
+            catch(errNum e)
+            {
+                return errMsg(e, "Usage \'cylx/y/z x/y y/z r\' @ Line number: " + to_string(lineNum));
+            }
         }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line
