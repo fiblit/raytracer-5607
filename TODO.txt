@@ -1,4 +1,3 @@
-Implement/test Cylinders
 Add endcaps/finite to cylinders
 Change imgBuf to an actual 2D array
 Change isDouble to detect doubles without the leading 0. (e.g ".5" or "-.7")
