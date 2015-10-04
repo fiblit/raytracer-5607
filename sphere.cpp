@@ -19,7 +19,7 @@ bool sphere::intersect(ray rr, double &t)
     double b = 2 * (rdir.getX() * (rloc.getX() - loc.getX()) + rdir.getY() * (rloc.getY() - loc.getY()) + rdir.getZ() * (rloc.getZ() - loc.getZ()));
     double c = pow(rloc.getX()-loc.getX(),2) + pow(rloc.getY()-loc.getY(),2) + pow(rloc.getZ()-loc.getZ(),2) - pow(radius, 2);
 
-    double discrim = (b * b) - (4 * c);//again assuming a=1
+    double discrim = pow(b, 2) - (4 * c);//again assuming a=1
 
     if (discrim < 0.0)
     {
