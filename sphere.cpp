@@ -45,7 +45,7 @@ bool sphere::intersect(ray rr, double &t)
 
 #include <iostream>
 
-rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<sphere> spheres)
+rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects)
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
@@ -68,10 +68,10 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<sphere> sphe
 
         int shadow = 1;
         ray shadowrr(inter, l);
-        for(int i = 0; i < (int)spheres.size(); i++)//for each sphere (object) in scene
+        for(object* obj: objects)//for each sphere (object) in scene
         {
             double tlig;
-            if(spheres[i].intersect(shadowrr, tlig))//if path to light interesects some sphere
+            if(obj->intersect(shadowrr, tlig))//if path to light interesects some sphere
             {
                 if(lit.getIsDir())
                 {

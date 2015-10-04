@@ -27,7 +27,7 @@ typedef struct fileData
     vector3 *updir;
     double *fovh;
     rgb *bkgcolor;
-    vector<sphere> *spheres;
+    vector<object *> *objects;
     vector<light> *lights;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);

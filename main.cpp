@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     int imgWidth, imgHeight;
     double fovh;
     rgb bkgcolor;
-    vector<sphere> spheres;//Might be later changed to "objects"
+    vector<object *> objects;//Might be later changed to "objects"
     vector<light> lights;
     //init fileData
     fileData_t fd;
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     fd.height = &imgHeight;
     fd.fovh = &fovh;
     fd.bkgcolor = &bkgcolor;
-    fd.spheres = &spheres;
+    fd.objects = &objects;
     fd.lights= &lights;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     cout << "updir: " << updir.getX() << " : " << updir.getY() << " : " << updir.getZ() << "\n";
     cout << "fovh: " << fovh << "\n";
     cout << "bkgcolor: " << bkgcolor.getR() << " : " << bkgcolor.getG() << " : " << bkgcolor.getB() << "\n";
-    for(sphere s : spheres)
+    for(sphere s : objects)
     {
         cout << "sphere: " << s.getLoc().getX() << " : " << s.getLoc().getY() << " : " << s.getLoc().getZ() << " : "
             << s.getRadius() << " : "
@@ -123,17 +123,17 @@ int main(int argc, char *argv[])
             int closest = -1;
             double closestInter = numeric_limits<double>::infinity();
             ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            for(int i = 0; i < (int)spheres.size(); i++)//for each sphere (object) in scene
+            for(int i = 0; i < objects.size(); i++)//for each sphere (object) in scene
             {
                 double t;
-                if(spheres[i].intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
+                if(objects[i]->intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
                     closestInter = t;
                     closest = i;
                 }
             }
             if (closest!=-1)
-                imgBuf[y*imgWidth+x] = spheres[closest].shadeRay(curRay, closestInter, lights, spheres);
+                imgBuf[y*imgWidth+x] = objects[closest]->shadeRay(curRay, closestInter, lights, objects);
         }
     }
 
