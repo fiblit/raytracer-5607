@@ -8,16 +8,17 @@
 #include "point.h"
 #include "ray.h"
 #include "light.h"
+#include "object.h"
 
 using namespace std;
 
-class sphere
+class sphere: public object
 {
     public:
         sphere();
         sphere(point loc, double radius, material mtl);
         bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t, vector<light> lights, vector<sphere> spheres);
+        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects);
         material getMtl();
         void setMtl(material mtl);
         point getLoc();

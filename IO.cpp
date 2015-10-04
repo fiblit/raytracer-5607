@@ -207,14 +207,18 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             {
                 double *params = getDoubleParams(4,inFileLine);//might throw
                 point p(params[0],params[1],params[2]);
-                (*fd.spheres).push_back (sphere(p,params[3],mtlcolor));
+                (*fd.objects).push_back (new sphere(p,params[3],mtlcolor));
+
+                if (params[3] <=0)
+                    return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
             }
             catch(errNum e)
             {
                 return errMsg(e,"Usage \'sphere x y z r\' @ Line number: " + to_string(lineNum));
             }
-            if ((*fd.spheres)[(*fd.spheres).size()-1].getRadius() <= 0)
-                return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
+
+            //if ((*fd.objects)[(*fd.objects).size()-1].getRadius() <= 0)
+            //    return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
 
         }
         else if (keyword == "light")
