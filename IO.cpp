@@ -300,14 +300,13 @@ double* getDoubleParams(int n, string &line)
     return params;
 }
 
-void writeOutFile(string fileName, rgb *imgBuf, int imgWidth, int imgHeight)
+void writeOutFile(string outFileName, rgb *imgBuf, int imgWidth, int imgHeight)
 {
     //Create Output File & Header
-    fileName = fileName.replace(fileName.length()-4,fileName.length()-1,".ppm");//change extension from .txt to .ppm
-    fileName = "/" + fileName; //For removing the path safely
-    fileName = fileName.replace(0,fileName.find_last_of('/')+1,"");//remove path
-    ofstream outFile(fileName, ofstream::trunc);
-    outFile << "P3\n# Created By Dalton H.\n";
+    ofstream outFile(outFileName, ofstream::trunc);
+    if(!outFile.is_open())
+        throw errMsg(INVFILE, "The output file could not open. The path might not exist.");
+    outFile << "P3\n# Created By Dalton Hildreth\n";
     outFile << imgWidth << " " << imgHeight << "\n";
     outFile << "255 \n";
 
