@@ -1,4 +1,4 @@
-raytrace: main.o vector3.o point.o ray.o sphere.o rgb.o bin/ obj/
+raytrace: obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o obj/IO.o obj/material.o obj/light.o obj/object.o obj/cylinder.o bin/ obj/
 	g++ -o bin/raytrace obj/*.o
 
 main.o: main.cpp obj/
@@ -15,6 +15,15 @@ rgb.o: rgb.cpp rgb.h obj/
 	g++ -std=c++11 -c rgb.cpp -o obj/rgb.o
 IO.o: IO.cpp IO.h obj/
 	g++ -std=c++11 -c IO.cpp -o obj/IO.o
+material.o: material.cpp material.h obj/
+	g++ -std=c++11 -c material.cpp -o obj/material.o
+light.o: light.cpp light.h obj/
+	g++ -std=c++11 -c light.cpp -o obj/light.o
+object.o: object.cpp object.h obj/
+	g++ -std=c++11 -c object.cpp -o obj/object.o
+cylinder.o: cylinder.cpp cylinder.h obj/
+	g++ -std=c++11 -c cylinder.cpp -o obj/cylinder.o
+
 
 obj/:
 	mkdir obj
@@ -22,4 +31,4 @@ bin/:
 	mkdir bin
 
 clean:
-	rm bin/* obj/*
+	rm -fr bin obj
