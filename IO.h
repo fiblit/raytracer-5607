@@ -7,6 +7,7 @@
 #include <string>
 #include "point.h"
 #include "sphere.h"
+#include "cylinder.h"
 #include "vector3.h"
 #include "rgb.h"
 #include "light.h"

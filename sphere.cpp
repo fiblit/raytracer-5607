@@ -48,7 +48,7 @@ bool sphere::intersect(ray rr, double &t)
 rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects)
 {
     /*
-    I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
+    I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
     */
     rgb color = mtl.getOd() * mtl.getka();
     point inter = rr.getLoc() + rr.getDir() * t;
