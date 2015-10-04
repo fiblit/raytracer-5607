@@ -19,26 +19,34 @@ double const PI = 3.14159265358979323846264338327950288;
 int main(int argc, char *argv[])
 {
     //GetInFileName
-    string fileName;//name of input file
+    string inFileName;
+    string outFileName;
     ifstream inFile;//input file
-	if (argc > 2)
-		return errMsg(INVCALL, (string)"Usage: \'" + (string)argv[0] + (string)" filename\', or \'" + (string)argv[0] + (string)"\' and it will prompt.");
-	else if (argc == 2)
-		fileName = argv[1];
+	if (argc > 3)
+		return errMsg(INVCALL, (string)"Usage: \'" + (string)argv[0] + (string)" inputfile outputfile\', or \'" +
+            (string)argv[0] + (string)" inputfile\', or \'" +
+            (string)argv[0] + (string)"\' and it will prompt for inputfile.");
+	else if (argc == 3)
+	{
+        inFileName = argv[1];
+        outFileName = argv[2];
+    }
+    else if (argc == 2)
+        inFileName = argv[1];
 	else
 	{
 		cout << "Please type the name of an existing .txt file (please include extension): ";
-		getline(cin,fileName);
+		getline(cin,inFileName);
 	}
 
     //Validate inFile
-    inFile.open(fileName);
+    inFile.open(inFileName);
     if (!inFile.is_open())
-        return errMsg(INVFILE,"Please enter the name of an existing .txt file.");
-    if (fileName.length()<=4 || fileName.substr(fileName.length()-4,fileName.length()-1)!=".txt")//the length <=4 is to make sure substr can be run in bounds.
+        return errMsg(INVFILE,"Please enter the name of an existing .txt file for the input.");
+    if (inFileName.length()<=4 || inFileName.substr(inFileName.length()-4,inFileName.length()-1)!=".txt")//the length <=4 is to make sure substr can be run in bounds.
     {
         inFile.close();
-        return errMsg(INVFILE,"Please enter a .txt file");
+        return errMsg(INVFILE,"Please enter the name of an existing .txt file for the input.");
     }
 
     //Read Scene
@@ -48,7 +56,7 @@ int main(int argc, char *argv[])
     int imgWidth, imgHeight;
     double fovh;
     rgb bkgcolor;
-    vector<object *> objects;//Might be later changed to "objects"
+    vector<object *> objects;//The pointer is because object is an ABC
     vector<light> lights;
     //init fileData
     fileData_t fd;
@@ -73,7 +81,7 @@ int main(int argc, char *argv[])
     cout << "updir: " << updir.getX() << " : " << updir.getY() << " : " << updir.getZ() << "\n";
     cout << "fovh: " << fovh << "\n";
     cout << "bkgcolor: " << bkgcolor.getR() << " : " << bkgcolor.getG() << " : " << bkgcolor.getB() << "\n";
-    for(sphere s : objects)
+    for(sphere s : objects)//I don't think this works anymore.
     {
         cout << "sphere: " << s.getLoc().getX() << " : " << s.getLoc().getY() << " : " << s.getLoc().getZ() << " : "
             << s.getRadius() << " : "
@@ -137,7 +145,22 @@ int main(int argc, char *argv[])
         }
     }
 
-    writeOutFile(fileName, imgBuf, imgWidth, imgHeight);
+    if (outFileName == "")//unspecified, save as same name in local directory
+    {
+        outFileName = inFileName.replace(inFileName.length()-4,inFileName.length()-1,".ppm");//change extension from .txt to .ppm
+        outFileName = "/" + outFileName; //For removing the path safely
+        outFileName = outFileName.replace(0,outFileName.find_last_of('/')+1,"");//remove path
+    }
+
+    try
+    {
+        writeOutFile(outFileName, imgBuf, imgWidth, imgHeight);
+    }
+    catch(int e)
+    {
+        return e;
+    }
+
     delete[] imgBuf;
 
     return 0;
