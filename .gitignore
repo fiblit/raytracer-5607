@@ -4,4 +4,4 @@
 *.ppm
 raytrace
 *.out
-scenes/
+scenes/tests/
