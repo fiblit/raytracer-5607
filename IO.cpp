@@ -230,7 +230,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 double *paramsRGB = getDoubleParams(3, inFileLine);
                 vector3 loc(paramsLoc[0], paramsLoc[1], paramsLoc[2]);
                 rgb color(paramsRGB[0], paramsRGB[1], paramsRGB[2]);
-                (*fd.lights).push_back (light(loc, (bool)paramsDir[0], color));
+                (*fd.lights).push_back (light(loc, !(bool)paramsDir[0], color));//The not is to deal with the 1/0 confusion. I'll have to change it.
             }
             catch(errNum e)
             {
