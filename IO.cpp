@@ -387,19 +387,24 @@ bool isInt(string str)
 //Determines if a string is a valid double
 bool isDouble(string str)
 {
-    if (str.length()<1 || (str[0]!='-' && str[0]!='+' && !isdigit(str[0])))
+    if (str.length()<1 || (str[0]!='-' && str[0]!='+' && !isdigit(str[0]) && str[0]!='.'))
         return false;//empty string, non-sign or non-digit first char.
+
+    bool dotSeen = false;
+    if(str[0]=='.')
+        dotSeen = true;
+
     int i;
     for (i = 1; i<(int)str.length(); i++)
         if(!isdigit(str[i]))
         {
-            if(str[i] == '.')
+            if(str[i] == '.' && !dotSeen)
             {
                 i++;
                 break;//its okay if we hit one dot
             }
             else
-                return false;// non-digit char
+                return false;// non-digit char or dot already seen
         }
     for (; i<(int)str.length(); i++)//pass over digits after dot (if there was no dot, then skip)
         if(!isdigit(str[i]))
