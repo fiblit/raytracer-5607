@@ -2,6 +2,8 @@
 #define CYLINDER_H
 
 #include <vector>
+#include <limits>//infinity
+#include <iostream>
 #include "ray.h"
 #include "light.h"
 #include "material.h"

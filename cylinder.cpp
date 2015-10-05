@@ -20,37 +20,95 @@ bool cylinder::intersect(ray rr, double &t)
     double a;
     double b;
     double c;
+
+    double endMinInter;//the t for rr intersecting the w=wmin plane
+    double endMinInterU;//the u position of where rr intersects the w=wmin plane
+    double endMinInterV;//the v position ...
+    double endMaxInter;//for max's plane
+    double endMaxInterU;//for max's plane
+    double endMaxInterV;//for max's plane
+    bool endMinHits = true;//For whether rr is parrallel to the plane, and if it is outside the circle (later)
+    bool endMaxHits = true;
+
     switch (getType())
     {
         case cylTypes::X://u = y, v = z, w = x
             a = pow(rdir.getY(), 2) + pow(rdir.getZ(), 2);
             b = 2 * (rdir.getY() * (rloc.getY() - getU()) + rdir.getZ() * (rloc.getZ() - getV()));
             c = pow(rloc.getY()-getU(), 2) + pow(rloc.getZ()-getV(), 2) - pow(radius, 2);
+
+            if (rdir.getX() < 0)
+            {
+                endMinHits = false;
+                endMaxHits = false;
+            }
+            else
+            {
+                endMinInter = (getMinw() - rloc.getX())/rdir.getX();//the t for the intersection with min plane
+                endMaxInter = (getMaxw() - rloc.getX())/rdir.getX();//... max plane
+                endMinInterU = rloc.getY() + rdir.getY()*endMinInter;
+                endMinInterV = rloc.getZ() + rdir.getZ()*endMinInter;
+                endMaxInterU = rloc.getY() + rdir.getY()*endMaxInter;
+                endMaxInterV = rloc.getZ() + rdir.getZ()*endMaxInter;
+            }
             break;
         case cylTypes::Y://u = x, v = z, w = y
             a = pow(rdir.getX(), 2) + pow(rdir.getZ(), 2);
             b = 2 * (rdir.getX() * (rloc.getX() - getU()) + rdir.getZ() * (rloc.getZ() - getV()));
-            c = pow(rloc.getX()-getU(), 2) + pow(rloc.getZ()-getV(), 2) - pow(radius, 2);;
+            c = pow(rloc.getX()-getU(), 2) + pow(rloc.getZ()-getV(), 2) - pow(radius, 2);
+
+            if (rdir.getY() < 0)
+            {
+                endMinHits = false;
+                endMaxHits = false;
+            }
+            else
+            {
+                endMinInter = (getMinw() - rloc.getY())/rdir.getY();//the t for the intersection with min plane
+                endMaxInter = (getMaxw() - rloc.getY())/rdir.getY();//... max plane
+                endMinInterU = rloc.getX() + rdir.getX()*endMinInter;
+                endMinInterV = rloc.getZ() + rdir.getZ()*endMinInter;
+                endMaxInterU = rloc.getX() + rdir.getX()*endMaxInter;
+                endMaxInterV = rloc.getZ() + rdir.getZ()*endMaxInter;
+            }
             break;
         case cylTypes::Z://u = x, v = y, w = z
             a = pow(rdir.getX(), 2) + pow(rdir.getY(), 2);
             b = 2 * (rdir.getX() * (rloc.getX() - getU()) + rdir.getY() * (rloc.getY() - getV()));
-            c = pow(rloc.getX()-getU(), 2) + pow(rloc.getY()-getV(), 2) - pow(radius, 2);;
+            c = pow(rloc.getX()-getU(), 2) + pow(rloc.getY()-getV(), 2) - pow(radius, 2);
+
+            if (rdir.getZ() < 0)
+            {
+                endMinHits = false;
+                endMaxHits = false;
+            }
+            else
+            {
+                endMinInter = (getMinw() - rloc.getZ())/rdir.getZ();//the t for the intersection with min plane
+                endMaxInter = (getMaxw() - rloc.getZ())/rdir.getZ();//... max plane
+                endMinInterU = rloc.getX() + rdir.getX()*endMinInter;
+                endMinInterV = rloc.getY() + rdir.getY()*endMinInter;
+                endMaxInterU = rloc.getX() + rdir.getX()*endMaxInter;
+                endMaxInterV = rloc.getY() + rdir.getY()*endMaxInter;
+            }
             break;
     }
 
     double discrim = pow(b, 2) - (4 * a * c);//again assuming a=1
 
+    bool sol1Hits = true;
+    bool sol2Hits = true;
+
     if (discrim < 0.0)
     {
-        return false; //No intersection, ray missed
+        sol1Hits = false;
+        sol2Hits = false;
     }
     double sol1 = ((-b) + sqrt(discrim))/(2 * a);
     double sol2 = ((-b) - sqrt(discrim))/(2 * a);
 
     double winter1;//uh... w intersection point... it just happened to be winter.
     double winter2;//for sol2
-    double winter;
     switch (getType())
     {
         case cylTypes::X:
@@ -67,22 +125,26 @@ bool cylinder::intersect(ray rr, double &t)
             break;
     }
 
-    bool sol1Hits = true;
-    bool sol2Hits = true;
-
     if (sol1 < 0 || winter1 < minw || winter1 > maxw)
         sol1Hits = false;
     if (sol2 < 0 || winter2 < minw || winter2 > maxw)
         sol2Hits = false;
+    if (sqrt(pow(endMinInterU - getU(),2) + pow(endMinInterV - getV(),2)) > getRadius())
+        endMinHits = false;
+    if (sqrt(pow(endMaxInterU - getU(),2) + pow(endMaxInterV - getV(),2)) > getRadius())
+        endMaxHits = false;
 
-    if (sol1Hits && sol2Hits)
-        t = (sol1 <= sol2)?sol1:sol2;
-    else if (sol1Hits)
-        t = sol1;
-    else if (sol2Hits)
-        t = sol2;
-    else
+    t = numeric_limits<double>::infinity();
+    if (!(sol1Hits || sol2Hits || endMinHits || endMaxHits))
         return false;
+    if (sol1Hits)
+        t = sol1;
+    if (sol2Hits)
+        t = (sol2 < t)?sol2:t;
+    if (endMinHits)
+        t = (endMinInter < t)?endMinInter:t;
+    if (endMaxHits)
+        t = (endMaxInter < t)?endMaxInter:t;
 
     return true; //intersection at t
 }
