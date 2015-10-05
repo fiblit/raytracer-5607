@@ -2,11 +2,13 @@
 
 cylinder::cylinder() { }
 
-cylinder::cylinder(double radius, double u, double v, cylTypes type, material mtl)
+cylinder::cylinder(double u, double v, double radius, double minw, double maxw, cylTypes type, material mtl)
 {
-    this->radius = radius;
     this->u = u;
     this->v = v;
+    this->minw = minw;
+    this->maxw = maxw;
+    this->radius = radius;
     this->type = type;
     this->mtl = mtl;
 }
@@ -20,17 +22,17 @@ bool cylinder::intersect(ray rr, double &t)
     double c;
     switch (getType())
     {
-        case cylTypes::X://u = y, v = z
+        case cylTypes::X://u = y, v = z, w = x
             a = pow(rdir.getY(), 2) + pow(rdir.getZ(), 2);
             b = 2 * (rdir.getY() * (rloc.getY() - getU()) + rdir.getZ() * (rloc.getZ() - getV()));
             c = pow(rloc.getY()-getU(), 2) + pow(rloc.getZ()-getV(), 2) - pow(radius, 2);
             break;
-        case cylTypes::Y://u = x, v = z
+        case cylTypes::Y://u = x, v = z, w = y
             a = pow(rdir.getX(), 2) + pow(rdir.getZ(), 2);
             b = 2 * (rdir.getX() * (rloc.getX() - getU()) + rdir.getZ() * (rloc.getZ() - getV()));
             c = pow(rloc.getX()-getU(), 2) + pow(rloc.getZ()-getV(), 2) - pow(radius, 2);;
             break;
-        case cylTypes::Z://u = x, v = y
+        case cylTypes::Z://u = x, v = y, w = z
             a = pow(rdir.getX(), 2) + pow(rdir.getY(), 2);
             b = 2 * (rdir.getX() * (rloc.getX() - getU()) + rdir.getY() * (rloc.getY() - getV()));
             c = pow(rloc.getX()-getU(), 2) + pow(rloc.getY()-getV(), 2) - pow(radius, 2);;
@@ -45,18 +47,42 @@ bool cylinder::intersect(ray rr, double &t)
     }
     double sol1 = ((-b) + sqrt(discrim))/(2 * a);
     double sol2 = ((-b) - sqrt(discrim))/(2 * a);
-    if (sol1 < 0)
+
+    double winter1;//uh... w intersection point... it just happened to be winter.
+    double winter2;//for sol2
+    double winter;
+    switch (getType())
     {
-        if (sol2 < 0)
-            return false; //No intersection, behind us
-        t = sol2;
+        case cylTypes::X:
+            winter1 = rloc.getX() + rdir.getX()*sol1;
+            winter2 = rloc.getX() + rdir.getX()*sol2;
+            break;
+        case cylTypes::Y:
+            winter1 = rloc.getY() + rdir.getY()*sol1;
+            winter2 = rloc.getY() + rdir.getY()*sol2;
+            break;
+        case cylTypes::Z:
+            winter1 = rloc.getZ() + rdir.getZ()*sol1;
+            winter2 = rloc.getZ() + rdir.getZ()*sol2;
+            break;
     }
-    else if (sol2 < 0)
+
+    bool sol1Hits = true;
+    bool sol2Hits = true;
+
+    if (sol1 < 0 || winter1 < minw || winter1 > maxw)
+        sol1Hits = false;
+    if (sol2 < 0 || winter2 < minw || winter2 > maxw)
+        sol2Hits = false;
+
+    if (sol1Hits && sol2Hits)
+        t = (sol1 <= sol2)?sol1:sol2;
+    else if (sol1Hits)
         t = sol1;
-    else if (sol1 <= sol2)
-        t = sol1;
-    else
+    else if (sol2Hits)
         t = sol2;
+    else
+        return false;
 
     return true; //intersection at t
 }
@@ -152,6 +178,16 @@ double cylinder::getV()
     return v;
 }
 
+double cylinder::getMaxw()
+{
+    return maxw;
+}
+
+double cylinder::getMinw()
+{
+    return minw;
+}
+
 cylinder::cylTypes cylinder::getType()
 {
     return type;
@@ -175,6 +211,16 @@ void cylinder::setU(double u)
 void cylinder::setV(double v)
 {
     this->v = v;
+}
+
+void cylinder::setMaxw(double maxw)
+{
+    this->maxw = maxw;
+}
+
+void cylinder::setMinw(double minw)
+{
+    this->minw = minw;
 }
 
 void cylinder::setType(cylTypes type)
