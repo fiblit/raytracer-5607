@@ -225,9 +225,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         {
             try
             {
-                double *paramsLoc = getDoubleParams(3,inFileLine);//the getParams might throw
-                int *paramsDir = getIntParams(1,inFileLine);
-                double *paramsRGB = getDoubleParams(3,inFileLine);
+                double *paramsLoc = getDoubleParams(3, inFileLine);//the getParams might throw
+                int *paramsDir = getIntParams(1, inFileLine);
+                double *paramsRGB = getDoubleParams(3, inFileLine);
                 vector3 loc(paramsLoc[0], paramsLoc[1], paramsLoc[2]);
                 rgb color(paramsRGB[0], paramsRGB[1], paramsRGB[2]);
                 (*fd.lights).push_back (light(loc, (bool)paramsDir[0], color));
@@ -253,7 +253,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(MSSKWD,"Need mtlcolor before this line @ Line number: " + to_string(lineNum));
             try
             {
-                double *params = getDoubleParams(3, inFileLine);//might throw
+                double *params = getDoubleParams(5, inFileLine);//might throw
                 cylinder::cylTypes type;
                 if (keyword == "cylx")
                     type = cylinder::cylTypes::X;
@@ -261,10 +261,12 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     type = cylinder::cylTypes::Y;
                 else
                     type = cylinder::cylTypes::Z;
-                (*fd.objects).push_back (new cylinder(params[2], params[0], params[1], type, mtlcolor));
+                (*fd.objects).push_back (new cylinder(params[0], params[1], params[2], params[3], params[4], type, mtlcolor));
 
+                if (params[3] > params[4])//minw > maxw
+                    return errMsg(INVPRM, "cylinder minw is greater than maxw @ Line number: " + to_string(lineNum));
                 if (params[2] <=0)
-                    return errMsg(INVPRM,"cylinder radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
+                    return errMsg(INVPRM, "cylinder radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
             }
             catch(errNum e)
             {
