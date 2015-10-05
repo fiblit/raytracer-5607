@@ -33,7 +33,10 @@ int main(int argc, char *argv[])
         outFileName = argv[2];
     }
     else if (argc == 2)
+    {
         inFileName = argv[1];
+        outFileName = "";
+    }
 	else
 	{
 		cout << "Please type the name of an existing .txt file (please include extension): ";
@@ -42,7 +45,7 @@ int main(int argc, char *argv[])
 		getline(cin, outFileName);
 	}
 
-    //Validate inFile
+    //Validate Infile
     inFile.open(inFileName);
     if (!inFile.is_open())
         return errMsg(INVFILE,"Please enter the name of an existing .txt file for the input.");
@@ -51,6 +54,11 @@ int main(int argc, char *argv[])
         inFile.close();
         return errMsg(INVFILE,"Please enter the name of an existing .txt file for the input.");
     }
+
+    //Validate OutFileName
+    if (outFileName != "" && (outFileName.length()<=4 || outFileName.substr(outFileName.length()-4, outFileName.length()-1)!=".ppm"))
+        return errMsg(INVFILE, "Please enter with a .ppm exetension for the output");
+
 
     //Read Scene
     int errval;
@@ -74,7 +82,7 @@ int main(int argc, char *argv[])
     fd.lights= &lights;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
-
+    inFile.close();
     /*
     //Scene Debug
     cout << "width: " << imgWidth << "\n";

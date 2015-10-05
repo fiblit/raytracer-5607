@@ -1,5 +1,4 @@
-Add endcaps to cylinders
-Add ppm validation
+(delayed) Add endcaps to cylinders
 Change isDir 1 to 0
 Draw Duel Scene
 Add optional finite parameters to cylinders

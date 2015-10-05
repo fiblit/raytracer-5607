@@ -50,7 +50,6 @@ bool cylinder::intersect(ray rr, double &t)
 
     double winter1;//uh... w intersection point... it just happened to be winter.
     double winter2;//for sol2
-    double winter;
     switch (getType())
     {
         case cylTypes::X:
