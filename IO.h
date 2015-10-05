@@ -34,6 +34,6 @@ typedef struct fileData
 int getInFileData(ifstream &inFile, fileData_t fd);
 int* getIntParams(int n, string &line);//helper function for above
 double* getDoubleParams(int n, string &line);//helper for above
-void writeOutFile(string fileName, rgb *imgBuf, int imgWidth, int imgHeight);
+void writeOutFile(string fileName, rgb **imgBuf, int imgWidth, int imgHeight);
 
 #endif // IO_H

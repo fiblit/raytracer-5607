@@ -326,7 +326,7 @@ double* getDoubleParams(int n, string &line)
     return params;
 }
 
-void writeOutFile(string outFileName, rgb *imgBuf, int imgWidth, int imgHeight)
+void writeOutFile(string outFileName, rgb **imgBuf, int imgWidth, int imgHeight)
 {
     //Create Output File & Header
     ofstream outFile(outFileName, ofstream::trunc);
@@ -341,7 +341,7 @@ void writeOutFile(string outFileName, rgb *imgBuf, int imgWidth, int imgHeight)
     {
         for (int x = 0; x < imgWidth; x++)
         {
-            outFile << (int)ceil(255*imgBuf[y*imgWidth+x].getR()) << " " << (int)ceil(255*imgBuf[y*imgWidth+x].getG()) << " " << (int)ceil(255*imgBuf[y*imgWidth+x].getB());
+            outFile << (int)ceil(255*imgBuf[y][x].getR()) << " " << (int)ceil(255*imgBuf[y][x].getG()) << " " << (int)ceil(255*imgBuf[y][x].getB());
             if (i==4)
             {
                 i=0;

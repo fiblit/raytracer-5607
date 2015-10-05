@@ -111,9 +111,10 @@ int main(int argc, char *argv[])
     */
 
     //Image Computations
-    //imgBuf is still a 2D *image*, it is just a 1D array. This was more for my convenience than anything else.
-    //I'll fix it in hw 1b (If I need to) once I understand the syntax of dynamically allocating multi-dimensional arrays in C++.
-    rgb *imgBuf = new rgb[imgHeight*imgWidth];//apparently allocating multidimensional arrays is frustrating(confusing,strange,stupid).
+    rgb **imgBuf = new rgb*[imgHeight];
+    for (int i = 0; i < imgHeight; i++)
+        imgBuf[i] = new rgb[imgWidth];
+
     double aspect = ((double)imgWidth)/imgHeight;//cast to double because they are ints
 
     //Viewing Window Compuatations
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
     {
         for(int x = 0; x < imgWidth; x++)
         {
-            imgBuf[y*imgWidth+x] = bkgcolor;//initialize to background
+            imgBuf[y][x] = bkgcolor;//initialize to background
             int closest = -1;
             double closestInter = numeric_limits<double>::infinity();
             ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
@@ -152,7 +153,7 @@ int main(int argc, char *argv[])
                 }
             }
             if (closest!=-1)
-                imgBuf[y*imgWidth+x] = objects[closest]->shadeRay(curRay, closestInter, lights, objects);
+                imgBuf[y][x] = objects[closest]->shadeRay(curRay, closestInter, lights, objects);
         }
     }
 
@@ -172,6 +173,8 @@ int main(int argc, char *argv[])
         return e;
     }
 
+    for (int i = 0; i < imgHeight; i++)
+        delete[] imgBuf[i];
     delete[] imgBuf;
 
     return 0;
