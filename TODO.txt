@@ -1,4 +1,3 @@
-Generalize the makefile
 Add Sphere (Cylinder?) Texturing
 Add Triangle
 Add New OBJ IO compatability
@@ -6,6 +5,7 @@ Add Triangle Intersection
 Add Triangle Texturing
 Draw&Make/Find Scenes
 (Optional) Add -o delimiter for outputs in the command-line. (e.g. raytrace inputfiles -o outputfiles)
+(Optional) Increase makefile generalization
 Data cleanup
 (delayed) Change each sphere holding material to a reference to a material table. (too much space)
 (delayed) Add optional finite parameters to cylinders
