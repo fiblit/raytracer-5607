@@ -8,16 +8,16 @@ class light
 {
     public:
         light();
-        light(vector3 loc, bool isDir, rgb color);
-        bool getIsDir();
+        light(vector3 loc, bool isPnt, rgb color);
+        bool getIsPnt();
         vector3 getLoc();
         rgb getColor();
-        void setIsDir(bool isDir);
+        void setIsPnt(bool isPnt);
         void setLoc(vector3 loc);
         void setColor(rgb color);
     private:
         vector3 loc;
-        bool isDir;
+        bool isPnt;
         rgb color;
 };
 

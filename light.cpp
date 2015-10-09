@@ -2,16 +2,16 @@
 
 light::light() { }
 
-light::light(vector3 loc, bool isDir, rgb color)
+light::light(vector3 loc, bool isPnt, rgb color)
 {
     this->loc = loc;
-    this->isDir = isDir;
+    this->isPnt = isPnt;
     this->color = color;
 }
 
-bool light::getIsDir()
+bool light::getIsPnt()
 {
-    return isDir;
+    return isPnt;
 }
 
 vector3 light::getLoc()
@@ -24,9 +24,9 @@ rgb light::getColor()
     return color;
 }
 
-void light::setIsDir(bool isDir)
+void light::setIsPnt(bool isPnt)
 {
-    this->isDir = isDir;
+    this->isPnt = isPnt;
 }
 
 void light::setLoc(vector3 loc)

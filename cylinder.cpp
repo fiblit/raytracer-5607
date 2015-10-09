@@ -106,10 +106,10 @@ rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> o
     for (light lit : lights)
     {
         vector3 l;
-        if (lit.getIsDir())
-            l = lit.getLoc() * (-1);//TO the light (right?)
-        else
+        if (lit.getIsPnt())
             l = lit.getLoc().toPoint().subtract(inter);
+        else
+            l = lit.getLoc() * (-1);//TO the light (right?)
         l = l.unit();
         vector3 h = l + v;
         h = h.unit();
@@ -121,9 +121,9 @@ rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> o
             double tlig;
             if(obj->intersect(shadowrr, tlig))//if path to light interesects some sphere
             {
-                if(lit.getIsDir())
+                if(lit.getIsPnt())
                 {
-                    if(tlig > 0.000001) // in front of me for directional
+                    if (tlig > 0.000001 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
                     {
                         shadow = 0;//then in shadow
                         break;
@@ -131,7 +131,7 @@ rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> o
                 }
                 else
                 {
-                    if (tlig > 0.000001 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
+                    if(tlig > 0.000001) // in front of me for directional
                     {
                         shadow = 0;//then in shadow
                         break;
