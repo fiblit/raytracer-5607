@@ -129,10 +129,17 @@ int main(int argc, char *argv[])
     //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written, since it is only used in multiplications!
     double viewWidth = 2*tan(fovh/2*PI/180);
     double viewHeight = viewWidth/aspect;
-    point ul = (eye.vect() + nviewdir*((double)parallel) + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
-    point ur = (eye.vect() + nviewdir*((double)parallel) + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
-    point ll = (eye.vect() + nviewdir*((double)parallel) - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
-    point lr = (eye.vect() + nviewdir*((double)parallel) - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();//unused
+    point ul = (eye.vect() + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point ur = (eye.vect() + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
+    point ll = (eye.vect() - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point lr = (eye.vect() - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();//unused
+    if (!parallel)
+    {
+        ul = ul + nviewdir;
+        ur = ur + nviewdir;
+        ll = ll + nviewdir;
+        lr = lr + nviewdir;
+    }
     vector3 deltav = ll.subtract(ul).fscale(imgHeight-1);
     vector3 deltah = ur.subtract(ul).fscale(imgWidth-1);
 
