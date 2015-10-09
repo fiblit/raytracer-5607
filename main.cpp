@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
     int imgWidth, imgHeight;
     double fovh;
     rgb bkgcolor;
+    bool parallel;
     vector<object *> objects;//The pointer is because object is an ABC
     vector<light> lights;
     //init fileData
@@ -78,6 +79,7 @@ int main(int argc, char *argv[])
     fd.height = &imgHeight;
     fd.fovh = &fovh;
     fd.bkgcolor = &bkgcolor;
+    fd.parallel = &parallel;
     fd.objects = &objects;
     fd.lights= &lights;
     if ((errval = getInFileData(inFile, fd)))
@@ -127,10 +129,10 @@ int main(int argc, char *argv[])
     //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written, since it is only used in multiplications!
     double viewWidth = 2*tan(fovh/2*PI/180);
     double viewHeight = viewWidth/aspect;
-    point ul = (eye.vect() + nviewdir + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
-    point ur = (eye.vect() + nviewdir + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
-    point ll = (eye.vect() + nviewdir - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
-    point lr = (eye.vect() + nviewdir - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();//unused
+    point ul = (eye.vect() + nviewdir*((double)parallel) + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point ur = (eye.vect() + nviewdir*((double)parallel) + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
+    point ll = (eye.vect() + nviewdir*((double)parallel) - v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
+    point lr = (eye.vect() + nviewdir*((double)parallel) - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();//unused
     vector3 deltav = ll.subtract(ul).fscale(imgHeight-1);
     vector3 deltah = ur.subtract(ul).fscale(imgWidth-1);
 
@@ -142,7 +144,11 @@ int main(int argc, char *argv[])
             imgBuf[y][x] = bkgcolor;//initialize to background
             int closest = -1;
             double closestInter = numeric_limits<double>::infinity();
-            ray curRay (eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
+            ray curRay;
+            if (parallel)
+                curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
+            else
+                curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
             for(int i = 0; i < (int)objects.size(); i++)//for each sphere (object) in scene
             {
                 double t;

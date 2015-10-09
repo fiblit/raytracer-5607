@@ -1,4 +1,3 @@
-Add Parallel Projection
 Modify all instances of isDir to be isPoint
 Generalize the makefile
 Add Sphere (Cylinder?) Texturing

@@ -27,6 +27,7 @@ typedef struct fileData
     vector3 *viewdir;
     vector3 *updir;
     double *fovh;
+    bool *parallel;
     rgb *bkgcolor;
     vector<object *> *objects;
     vector<light> *lights;

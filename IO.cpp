@@ -49,9 +49,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
     //read data
     material mtlcolor;
-    bool kwdIsDef [7] = {false, false, false, false, false, false, false};//we shouldn't see most keywords twice
+    bool kwdIsDef [8] = {false, false, false, false, false, false, false, false};//we shouldn't see most keywords twice
         //we also should see mtlcolor before the first sphere
-    enum kwd {EYE,VIEWDIR,UPDIR,FOVH,IMSIZE,BKGCOLOR,MTLCOLOR};//we don't need to know about sphere being defined
+    enum kwd {EYE,VIEWDIR,UPDIR,FOVH,IMSIZE,BKGCOLOR,MTLCOLOR,PARALLEL};//we don't need to know about sphere being defined
     while(!inFile.eof())
     {
         //determine keyword
@@ -265,13 +265,20 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
                 if (params[3] > params[4])//minw > maxw
                     return errMsg(INVPRM, "cylinder minw is greater than maxw @ Line number: " + to_string(lineNum));
-                if (params[2] <=0)
+                if (params[2] <= 0)
                     return errMsg(INVPRM, "cylinder radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
             }
             catch(errNum e)
             {
                 return errMsg(e, "Usage \'cylx/y/z x/y y/z r\' @ Line number: " + to_string(lineNum));
             }
+        }
+        else if (keyword == "parallel")
+        {
+            if (kwdIsDef[PARALLEL])
+                return errMsg(REPKWD, "please use on parallel keyword. Remove parallel @ Line number: " + to_string(lineNum));
+            *fd.parallel = true;
+            kwdIsDef[PARALLEL] = true;
         }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line
@@ -287,6 +294,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
     for (int i = 0; i <= BKGCOLOR ; i++)
         if(!kwdIsDef[i])
             return errMsg(MSSKWD,"Please define " + kwdString[i]);
+    if (!kwdIsDef[PARALLEL])
+        *fd.parallel = false;
 
     inFile.close();
     return 0;
