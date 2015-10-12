@@ -49,9 +49,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
     //read data
     material mtlcolor;
-    bool kwdIsDef [8] = {false, false, false, false, false, false, false, false};//we shouldn't see most keywords twice
+    bool kwdIsDef [9] = {false, false, false, false, false, false, false, false, false};//we shouldn't see most keywords twice
         //we also should see mtlcolor before the first sphere
-    enum kwd {EYE,VIEWDIR,UPDIR,FOVH,IMSIZE,BKGCOLOR,MTLCOLOR,PARALLEL};//we don't need to know about sphere being defined
+    enum kwd {EYE, VIEWDIR, UPDIR, FOVH, IMSIZE, BKGCOLOR, MTLCOLOR, PARALLEL, TEXTURE};//we don't need to know about sphere (objects) being defined
     while(!inFile.eof())
     {
         //determine keyword
@@ -220,7 +220,11 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             {
                 double *params = getDoubleParams(4,inFileLine);//might throw
                 point p(params[0],params[1],params[2]);
-                (*fd.objects).push_back (new sphere(p,params[3],mtlcolor));
+                int texIndex = -1;//-1 means no texture is defined (NULL)
+                if (kwdIsDef[TEXTURE])
+                    texIndex = (*fd.textures).size() - 1;
+
+                (*fd.objects).push_back (new sphere(p, params[3], mtlcolor, texIndex));
 
                 if (params[3] <=0)
                     return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
@@ -315,13 +319,15 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
                 try
                 {
-                    (*fd.textures).push_back (getTextureImage(texFile));
+                    (*fd.textures).push_back (getTexture(texFile));
                 }
                 catch(errNum e)
                 {
                     return errMsg(e, "There was an error in reading the texture @ Line Number: " + to_string(lineNum));
                 }
 
+                kwdIsDef[TEXTURE] = true;
+                texFile.close();
                 delete[] tex;
             }
             catch(errNum e)
@@ -399,7 +405,7 @@ string *getStringParams(int n, string &line)
     return params;
 }
 
-rgb **getTextureImage(ifstream &texFile)
+texture getTexture(ifstream &texFile)
 {
     string line;
     getline(texFile, line);
@@ -410,19 +416,28 @@ rgb **getTextureImage(ifstream &texFile)
     int height = header[1];
     int value = header[2];
 
-    rgb **texture = new rgb*[height];
+    rgb **textureImg = new rgb*[height];
     for (int i = 0; i < height; i++)
-        texture[i] = new rgb[width];
+        textureImg[i] = new rgb[width];
 
-    getline(texFile, line);
+    string r;//Stupid GIMP
+    string g;
+    string b;
+    getline(texFile, r);
+    getline(texFile, g);
+    getline(texFile, b);
     for(int lineNum = 0; !texFile.eof(); lineNum++)
     {
-        int *pixel = getIntParams(3, line);
-        texture[lineNum/width][lineNum%width] = rgb(((double)pixel[0])/value, ((double)pixel[1])/value, ((double)pixel[2])/value);
-        getline(texFile, line);
+        int *pixelr = getIntParams(1, r);
+        int *pixelg = getIntParams(1, g);
+        int *pixelb = getIntParams(1, b);
+        textureImg[lineNum/width][lineNum%width] = rgb(((double)pixelr[0])/value, ((double)pixelg[0])/value, ((double)pixelb[0])/value);
+        getline(texFile, r);
+        getline(texFile, g);
+        getline(texFile, b);
     }
 
-    return texture;
+    return texture(textureImg, width, height);
 }
 
 void writeOutFile(string outFileName, rgb **imgBuf, int imgWidth, int imgHeight)

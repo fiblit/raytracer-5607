@@ -2,11 +2,12 @@
 
 sphere::sphere() {}
 
-sphere::sphere(point loc, double radius, material mtl)
+sphere::sphere(point loc, double radius, material mtl, int texIndex)
 {
     this->loc = loc;
     this->radius = radius;
     this->mtl = mtl;
+    this->texIndex = texIndex;
 }
 
 //Determines if the ray rr intersects this sphere.
@@ -45,15 +46,30 @@ bool sphere::intersect(ray rr, double &t)
 
 #include <iostream>
 
-rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects)
+rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures)
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
     */
-    rgb color = mtl.getOd() * mtl.getka();
     point inter = rr.getLoc() + rr.getDir() * t;
     vector3 n = (inter.subtract(loc)).fscale(radius);
     vector3 v = rr.getDir() * (-1);//TO the viewer
+
+    rgb diffuse;
+    if (texIndex == -1)
+        diffuse = mtl.getOd();
+    else
+    {
+        double theta = atan2(n.getY(), n.getX());
+        double phi = acos(n.getZ());
+        if(theta < 0)
+            theta += 2 * PI;
+        double vTex = phi / PI;
+        double uTex = theta / (2 * PI);
+
+        diffuse = textures[texIndex].getImg()[(int)(0.5 + vTex * (textures[texIndex].getHeight() - 1))][(int)(0.5 + uTex * (textures[texIndex].getWidth() - 1))];
+    }
+    rgb color = diffuse * mtl.getka();
     //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
     for (light lit : lights)
     {
@@ -92,7 +108,7 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> obj
             }
         }
 
-        color = color + lit.getColor() * ((mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())))) * shadow;
+        color = color + lit.getColor() * ((diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())))) * shadow;
         //parenthesis are right     10   12         32   3         43      4                 5 4321   2         32   3         43      4   5                 6 54          543210
         if (color.getR() > 1.0)
             color.setR(1.0);

@@ -14,7 +14,7 @@ class cylinder: public object
         cylinder();
         cylinder(double u, double v, double radius, double minw, double maxw, cylTypes type, material mtl);
         bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects);
+        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures);
         double getRadius();
         double getU();
         double getV();

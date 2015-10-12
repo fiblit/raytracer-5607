@@ -86,7 +86,7 @@ bool cylinder::intersect(ray rr, double &t)
     return true; //intersection at t
 }
 
-rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects)
+rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures)
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]

@@ -9,16 +9,19 @@
 #include "ray.h"
 #include "light.h"
 #include "object.h"
+#include "texture.h"
 
 using namespace std;
+
+double const PI = 3.14159265358979323846264338327950288;
 
 class sphere: public object
 {
     public:
         sphere();
-        sphere(point loc, double radius, material mtl);
+        sphere(point loc, double radius, material mtl, int texIndex);
         bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects);
+        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures);
         point getLoc();
         double getRadius();
         material getMtl();

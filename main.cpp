@@ -12,10 +12,11 @@
 #include "rgb.h"
 #include "ray.h"
 #include "IO.h"
+#include "texture.h"
 
 using namespace std;
 
-double const PI = 3.14159265358979323846264338327950288;//I actually know those digits by heart, I have it down to a little rhythm.
+//double const PI = 3.14159265358979323846264338327950288;//I actually know those digits by heart, I have it down to a little rhythm.
 
 int main(int argc, char *argv[])
 {
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
     bool parallel;
     vector<object *> objects;//The pointer is because object is an ABC (you can't instantiate an object)
     vector<light> lights;
-    vector<rgb **> textures;
+    vector<texture> textures;
     //init fileData
     fileData_t fd;
     fd.eye = &eye;
@@ -168,7 +169,7 @@ int main(int argc, char *argv[])
                 }
             }
             if (closest!=-1)
-                imgBuf[y][x] = objects[closest]->shadeRay(curRay, closestInter, lights, objects);
+                imgBuf[y][x] = objects[closest]->shadeRay(curRay, closestInter, lights, objects, textures);
         }
     }
 
