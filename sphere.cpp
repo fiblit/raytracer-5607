@@ -114,24 +114,9 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> obj
     return color;
 }
 
-material sphere::getMtl()
-{
-    return mtl;
-}
-
-void sphere::setMtl(material mtl)
-{
-    this->mtl = mtl;
-}
-
 point sphere::getLoc()
 {
     return loc;
-}
-
-void sphere::setLoc(point p)
-{
-    loc = p;
 }
 
 double sphere::getRadius()
@@ -139,7 +124,32 @@ double sphere::getRadius()
     return radius;
 }
 
+material sphere::getMtl()
+{
+    return mtl;
+}
+
+int sphere::getTexIndex()
+{
+    return texIndex;
+}
+
+void sphere::setLoc(point p)
+{
+    loc = p;
+}
+
 void sphere::setRadius(double r)
 {
     radius = r;
+}
+
+void sphere::setMtl(material mtl)
+{
+    this->mtl = mtl;
+}
+
+void sphere::setTexIndex(int i)
+{
+    texIndex = i;
 }

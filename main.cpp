@@ -68,8 +68,9 @@ int main(int argc, char *argv[])
     double fovh;
     rgb bkgcolor;
     bool parallel;
-    vector<object *> objects;//The pointer is because object is an ABC
+    vector<object *> objects;//The pointer is because object is an ABC (you can't instantiate an object)
     vector<light> lights;
+    vector<rgb **> textures;
     //init fileData
     fileData_t fd;
     fd.eye = &eye;
@@ -81,7 +82,8 @@ int main(int argc, char *argv[])
     fd.bkgcolor = &bkgcolor;
     fd.parallel = &parallel;
     fd.objects = &objects;
-    fd.lights= &lights;
+    fd.lights = &lights;
+    fd.textures = &textures;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
     inFile.close();

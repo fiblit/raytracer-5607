@@ -31,10 +31,13 @@ typedef struct fileData
     rgb *bkgcolor;
     vector<object *> *objects;
     vector<light> *lights;
+    vector<rgb **> *textures;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);
-int* getIntParams(int n, string &line);//helper function for above
-double* getDoubleParams(int n, string &line);//helper for above
+int *getIntParams(int n, string &line);
+double *getDoubleParams(int n, string &line);
+string *getStringParams(int n, string &line);
+rgb **getTextureImage(ifstream &texFile);
 void writeOutFile(string fileName, rgb **imgBuf, int imgWidth, int imgHeight);
 
 #endif // IO_H

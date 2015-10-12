@@ -19,17 +19,19 @@ class sphere: public object
         sphere(point loc, double radius, material mtl);
         bool intersect(ray rr, double &t);
         rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects);
-        material getMtl();
-        void setMtl(material mtl);
         point getLoc();
-        void setLoc(point p);
         double getRadius();
+        material getMtl();
+        int getTexIndex();
+        void setLoc(point p);
         void setRadius(double r);
+        void setMtl(material mtl);
+        void setTexIndex(int i);
     private:
         point loc;
         double radius;
-        //rgb color;
-        material mtl;
+        material mtl; // TODO: change to mtlIndex
+        int texIndex;
 };
 
 #endif // SPHERE_H

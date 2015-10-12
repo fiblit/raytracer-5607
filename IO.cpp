@@ -60,7 +60,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
         //validate/perform keyword
         string param;
-        if (keyword == "eye")
+        if (keyword == "eye")//TODO: add handler functions for each keyword.
         {
             if (kwdIsDef[EYE])//if eye has already been seen
                 return errMsg(REPKWD,"Line number: " + to_string(lineNum));
@@ -69,6 +69,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 double *params = getDoubleParams(3,inFileLine);//might throw
                 *fd.eye = point(params[0],params[1],params[2]);
                 kwdIsDef[EYE] = true;
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -84,6 +86,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 double *params = getDoubleParams(3,inFileLine);//might throw
                 *fd.viewdir = vector3(params[0],params[1],params[2]);
                 kwdIsDef[VIEWDIR] = true;
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -120,6 +124,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 double *params = getDoubleParams(1,inFileLine);//might throw
                 *fd.fovh = params[0];
                 kwdIsDef[FOVH] = true;
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -139,6 +145,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 *fd.width = params[0];
                 *fd.height = params[1];
                 kwdIsDef[IMSIZE] = true;
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -159,6 +167,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 double *params = getDoubleParams(3,inFileLine);//might throw
                 *fd.bkgcolor = rgb(params[0],params[1],params[2]);
                 kwdIsDef[BKGCOLOR] = true;
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -180,6 +190,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 int *paramsI = getIntParams(1, inFileLine);//Since n should be int, not double.
                 mtlcolor = material(rgb(params[0],params[1],params[2]), rgb(params[3],params[4],params[5]), params[6], params[7], params[8], paramsI[0]);
                 kwdIsDef[MTLCOLOR] = true;
+
+                delete[] params;
+                delete[] paramsI;
             }
             catch(errNum e)
             {
@@ -211,6 +224,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
                 if (params[3] <=0)
                     return errMsg(INVPRM,"sphere radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -231,6 +246,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 vector3 loc(paramsLoc[0], paramsLoc[1], paramsLoc[2]);
                 rgb color(paramsRGB[0], paramsRGB[1], paramsRGB[2]);
                 (*fd.lights).push_back (light(loc, (bool)paramsPnt[0], color));
+
+                delete[] paramsLoc;
+                delete[] paramsPnt;
+                delete[] paramsRGB;
             }
             catch(errNum e)
             {
@@ -267,6 +286,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     return errMsg(INVPRM, "cylinder minw is greater than maxw @ Line number: " + to_string(lineNum));
                 if (params[2] <= 0)
                     return errMsg(INVPRM, "cylinder radius is out of range (0,inf) @ Line number: " + to_string(lineNum));
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -280,9 +301,37 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             *fd.parallel = true;
             kwdIsDef[PARALLEL] = true;
         }
+        else if (keyword == "texture")
+        {
+            try
+            {
+                string *tex = getStringParams(1, inFileLine);
+                if (tex[0].length()<=4 || tex[0].substr(tex[0].length()-4, tex[0].length()-1)!=".ppm")
+                    return errMsg(INVFILE, "Please use a .ppm file @ Line Number: " + to_string(lineNum));
+
+                ifstream texFile(tex[0]);
+                if (!texFile.is_open())
+                    return errMsg(INVFILE, "Please use an existing .ppm file @ Line Number: " + to_string(lineNum));
+
+                try
+                {
+                    (*fd.textures).push_back (getTextureImage(texFile));
+                }
+                catch(errNum e)
+                {
+                    return errMsg(e, "There was an error in reading the texture @ Line Number: " + to_string(lineNum));
+                }
+
+                delete[] tex;
+            }
+            catch(errNum e)
+            {
+                return errMsg(e, "Usage \'texture texture_file.ppm\' @ Line Number: " + to_string(lineNum));
+            }
+        }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line
-        else //unknown keyword
+        else
             return errMsg(INVKWD,"Unknown Keyword @ Line number: " + to_string(lineNum));
 
         //Read next line
@@ -301,8 +350,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
     return 0;
 }
 
-// helper function for getInFileData
-int* getIntParams(int n, string &line)
+/* reads a line for n ints */
+int *getIntParams(int n, string &line)
 {
     int *params = new int [n];
     string param;
@@ -318,8 +367,8 @@ int* getIntParams(int n, string &line)
     return params;
 }
 
-// helper function for getInFileData
-double* getDoubleParams(int n, string &line)
+/* reads a line for n doubles */
+double *getDoubleParams(int n, string &line)
 {
     double *params = new double [n];
     string param;
@@ -333,6 +382,47 @@ double* getDoubleParams(int n, string &line)
         params[i] = atof(param.c_str());
     }
     return params;
+}
+
+/* reads a line for n strings (words) */
+string *getStringParams(int n, string &line)
+{
+    string *params = new string[n];
+    string param;
+    for (int i = 0; i < n; i++)
+    {
+        param = getWord(line);
+        if (param == "")//end of line reached and parameters are still desired
+            throw MSSPRM;
+        params[i] = param;
+    }
+    return params;
+}
+
+rgb **getTextureImage(ifstream &texFile)
+{
+    string line;
+    getline(texFile, line);
+    if (getWord(line)!="P3")
+        throw INVFILE;
+    int *header = getIntParams(3, line);
+    int width = header[0];
+    int height = header[1];
+    int value = header[2];
+
+    rgb **texture = new rgb*[height];
+    for (int i = 0; i < height; i++)
+        texture[i] = new rgb[width];
+
+    getline(texFile, line);
+    for(int lineNum = 0; !texFile.eof(); lineNum++)
+    {
+        int *pixel = getIntParams(3, line);
+        texture[lineNum/width][lineNum%width] = rgb(((double)pixel[0])/value, ((double)pixel[1])/value, ((double)pixel[2])/value);
+        getline(texFile, line);
+    }
+
+    return texture;
 }
 
 void writeOutFile(string outFileName, rgb **imgBuf, int imgWidth, int imgHeight)
