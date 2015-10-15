@@ -1,5 +1,6 @@
-Add Triangle
+Add Triangles
 Add New OBJ IO compatability
+(The above two include implementing Faces, Vertices, Vertex normals, etc. Faces will be "triangles")
 Add Triangle Intersection
 Add Triangle Texturing
 Draw&Make/Find (obj) Scenes
