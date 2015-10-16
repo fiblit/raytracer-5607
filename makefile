@@ -34,6 +34,8 @@ obj/cylinder.o: cylinder.cpp cylinder.h | obj/
 	$(CC) $(OPT) -c cylinder.cpp -o obj/cylinder.o
 obj/texture.o: texture.cpp texture.h | obj/
 	$(CC) $(OPT) -c texture.cpp -o obj/texture.o
+obj/triangle.o: triangle.cpp triangle.h | obj/
+	$(CC) $(OPT) -c triangle.cpp -o obj/triangle.o
 
 obj/:
 	mkdir obj
