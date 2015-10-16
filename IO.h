@@ -12,10 +12,12 @@
 #include "rgb.h"
 #include "light.h"
 #include "texture.h"
+#include "triangle.h"
 
 using namespace std;
 
 string getWord(string &line);
+vector<string> split(string &str, string const delims);
 bool isInt(string str);
 bool isDouble(string str);
 int errMsg(int err, string msg);
@@ -33,6 +35,10 @@ typedef struct fileData
     vector<object *> *objects;
     vector<light> *lights;
     vector<texture> *textures;
+    vector<point> *vertices;
+    vector<triangle::vertexTexture> *vTextures;
+    vector<vector3> *vNormals;
+    vector<triangle> *faces;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);
 int *getIntParams(int n, string &line);

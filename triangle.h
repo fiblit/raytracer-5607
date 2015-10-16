@@ -6,10 +6,7 @@
 #include "object.h"
 #include "material.h"
 
-typedef struct vt {
-    int u;
-    int v;
-} vertexTexture;
+
 
 class triangle: public object {//equivalent to an 'f' in the input.
     public:
@@ -17,6 +14,13 @@ class triangle: public object {//equivalent to an 'f' in the input.
         triangle(int v[3]);
         triangle(int v[3], int vn[3]);
         triangle(int v[3], int vt[3], int vn[3]);
+
+        typedef struct vt
+        {
+            double u;
+            double v;
+        } vertexTexture;
+
         bool intersect(ray rr, double &t);
         rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures);
         int getv(int i);

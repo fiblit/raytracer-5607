@@ -13,6 +13,7 @@
 #include "ray.h"
 #include "IO.h"
 #include "texture.h"
+#include "triangle.h"
 
 using namespace std;
 
@@ -72,6 +73,10 @@ int main(int argc, char *argv[])
     vector<object *> objects;//The pointer is because object is an ABC (you can't instantiate an object)
     vector<light> lights;
     vector<texture> textures;
+    vector<point> vertices;
+    vector<triangle::vertexTexture> vTextures;
+    vector<vector3> vNormals;
+    vector<triangle> faces;
     //init fileData
     fileData_t fd;
     fd.eye = &eye;
@@ -85,6 +90,10 @@ int main(int argc, char *argv[])
     fd.objects = &objects;
     fd.lights = &lights;
     fd.textures = &textures;
+    fd.vertices = &vertices;
+    fd.vTextures = &vTextures;
+    fd.vNormals = &vNormals;
+    fd.faces = &faces;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
     inFile.close();

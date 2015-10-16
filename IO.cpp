@@ -335,6 +335,124 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e, "Usage \'texture texture_file.ppm\' @ Line Number: " + to_string(lineNum));
             }
         }
+        else if (keyword == "v")
+        {
+            try
+            {
+                double *loc = getDoubleParams(3, inFileLine);//might throw
+                (*fd.vertices).push_back (point(loc[0], loc[1], loc[2]) );
+
+                delete[] loc;
+            }
+            catch(errNum e)
+            {
+                return errMsg(e,"Usage \'v x y z\' @ Line number: " + to_string(lineNum));
+            }
+        }
+        else if (keyword == "vt")
+        {
+            try
+            {
+                double *coords = getDoubleParams(2, inFileLine);//might throw
+                triangle::vertexTexture uv;
+                uv.u = coords[0];
+                uv.v = coords[1];
+                (*fd.vTextures).push_back (uv);
+
+                delete[] coords;
+            }
+            catch(errNum e)
+            {
+                return errMsg(e, "Usage \'vt u v\' @ Line number: " + to_string(lineNum));
+            }
+        }
+        else if (keyword == "vn")
+        {
+            try
+            {
+                double *norm = getDoubleParams(3, inFileLine);//might throw
+                (*fd.vNormals).push_back (vector3(norm[0], norm[1], norm[2]) );
+
+                delete[] norm;
+            }
+            catch(errNum e)
+            {
+                return errMsg(e,"Usage \'vn dx dy dz\' @ Line number: " + to_string(lineNum));
+            }
+
+            if ((*fd.vNormals)[(*fd.vNormals).size() - 1].getX() == 0 && (*fd.updir).getY() == 0 && (*fd.updir).getZ() == 0) //validate value
+                return errMsg(INVPRM,"vn is the zero vector @ Line number: " + to_string(lineNum));
+        }
+        else if (keyword == "f")
+        {
+            int vParams[3] = {-1, -1, -1};
+            int vtParams[3] = {-1, -1, -1};
+            int vnParams[3] = {-1, -1, -1};
+            bool hasVt;
+
+            for (int i = 0; i < 3; i++) //handle the varying syntax of 'f' (which screwed with my modularity)
+            {
+                string param = getWord(inFileLine);
+                vector<string> vertexParam = split(param, "/");
+                if (vertexParam.size() == 1)//v1 v2 v3 format
+                {
+                    if (vertexParam[0] == "")
+                        return errMsg(MSSPRM, "Missing a vertex @ Line number: " + to_string(lineNum));
+
+                    if (!isInt(vertexParam[0]))
+                        return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
+
+                    vParams[i] = atoi(vertexParam[0].c_str());
+                }
+                else if (vertexParam.size() == 2)//v/vt format
+                {
+                    if (vertexParam[0] == "")
+                        return errMsg(MSSPRM, "Missing a vertex @ Line number: " + to_string(lineNum));
+                    if (vertexParam[1] == "")
+                        return errMsg(MSSPRM, "Missing a vertex texture coord @ Line number: " + to_string(lineNum));
+
+                    if (!isInt(vertexParam[0]))
+                        return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
+                    if (!isInt(vertexParam[1]))
+                        return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
+
+                    vParams[i] = atoi(vertexParam[0].c_str());
+                    vtParams[i] = atoi(vertexParam[1].c_str());
+                }
+                else if (vertexParam.size() == 3)// v/(vt)/vn format
+                {
+                    if (vertexParam[0] == "")
+                        return errMsg(MSSPRM, "Missing a vertex @ Line number: " + to_string(lineNum));
+                    if (vertexParam[2] == "")
+                        return errMsg(MSSPRM, "Missing a vertex normal @ Line number: " + to_string(lineNum));
+                    if (i == 0)
+                        hasVt = (vertexParam[1] != "");
+                    else
+                    {
+                        if ((hasVt && (vertexParam[1] == "")) || (!hasVt && (vertexParam[1] != "")))//inconsistent vt
+                            return errMsg(MSSPRM, "There needs to be a vt defined for all vertices, since one is defined. @ Line number: " + to_string(lineNum));
+                    }
+
+                    if (!isInt(vertexParam[0]))
+                        return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
+                    if (hasVt && !isInt(vertexParam[1]))//need to make sure we're doing vt
+                        return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
+                    if (!isInt(vertexParam[3]))
+                        return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
+
+                    vParams[i] = atoi(vertexParam[0].c_str());
+                    if (hasVt)
+                        vtParams[i] = atoi(vertexParam[1].c_str());
+                    vnParams[i] = atoi(vertexParam[2].c_str());
+                }
+                else
+                    return errMsg(INVPRM, "Usage \'f v1 v2 v3\' or \'f v1//vn1 v2//vn2 v3//vn3\' or \'f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3\' @ Line number: " + to_string(lineNum));
+            }
+
+            (*fd.faces).push_back(triangle(vParams, vtParams, vnParams));
+
+            //No deletes since the params aren't on the heap this time :P
+        }
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line
         else
@@ -485,6 +603,24 @@ string getWord(string &line) //So it turns out that C++ already has a way to do 
     }
     line = &line[i];//Update line
     return word;
+}
+
+vector<string> split(string &str, const string delims)
+{
+    vector<string> result;
+    while(!str.empty())
+    {
+        string word = "";
+        int i = 0;
+        while (delims.find(str[i])==string::npos && i<(int)str.length())//while no delim
+        {
+            word+=str[i];
+            i++;
+        }
+        str = &str[i];//Update line
+        result.push_back(word);
+    }
+    return result;
 }
 
 //Determines if a string is a valid integer.

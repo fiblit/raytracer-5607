@@ -1,12 +1,22 @@
 #include "triangle.h"
 
-triangle::triangle() { }
+triangle::triangle()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        v[i] = -1;
+        vt[i] = -1;
+        vn[i] = -1;
+    }
+}
 
 triangle::triangle(int v[3])
 {
     for (int i = 0; i < 3; i++)//deepcopy
     {
         this->v[i] = v[i];
+        vt[i] = -1;
+        vn[i] = -1;
     }
 }
 
@@ -15,6 +25,7 @@ triangle::triangle(int v[3], int vn[3])
     for (int i = 0; i < 3; i++)
     {
         this->v[i] = v[i];
+        vt[i] = -1;
         this->vn[i] = vn[i];
     }
 }
