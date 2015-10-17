@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
                 curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
             else
                 curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            for(int i = 0; i < (int)objects.size(); i++)//for each sphere (object) in scene
+            for(int i = 0; i < (int)objects.size(); i++)//for each object in scene
             {
                 double t;
                 if(objects[i]->intersect(curRay, t, &fd) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t

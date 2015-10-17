@@ -75,40 +75,15 @@ bool triangle::intersect(ray rr, double &t, fileData_t *fd)//fd for vertices
     double s = a*m + b*n + c*o;
 
     t = -(f*p + e*q + d*r)/s;
-    if (t <= 0)
-        return false;
-    gamma = (i*p + h*q + g*r)/s;
-    if (!(gamma > 0 && gamma < 1))
-        return false;
-    beta = (j*m + k*n + l*o)/s;//beta and gamma are defined as member variables in triangle.
-    if (!(beta > 0 && beta < 1-gamma))
-        return false;
-    /*//ray/plane intersection
-    vector3 e1 = v1.subtract(v0);
-    vector3 e2 = v2.subtract(v0));
-    vector3 n = e1.crossProduct(e2);
-    double a = n.getX();
-    double b = n.getY();
-    double c = n.getZ();
-    double d = -(a*v0.getX() + b*v0.getY() + c*v0.getZ());
-    double denom = (a*dir.getX() + b*dir.getY() + c*dir.getZ())
-    if (denom == 0)
-        return false; //ray is parallel to plane
-    t = -(a*loc.getX() + b*loc.getY() + c*loc.getZ() + d)/denom;
     if (t < 0)
-        return false;//behind me :c
-
-    //point in polygon
-    calculate A
-    calculate areaA
-    calculate areaB
-    calculate areaC
-    calculate alpha
-    caluclate beta
-    calculate gamma
-    validation check (alpha+beta+gamma == 1)
-    */
-    return true;
+        return false;//behind me
+    gamma = (i*p + h*q + g*r)/s;//beta and gamma are defined as member variables in triangle.
+    if (!(gamma >= 0 && gamma <= 1))// the equals are so the rays intersect edges (without them there are black spots on edges) (although, it turns out only one is nessecary)
+        return false; // outside of triangle
+    beta = (j*m + k*n + l*o)/s;
+    if (!(beta >= 0 && beta <= 1-gamma))
+        return false; //outside of triangle
+    return true;//Nothing broke, so t is valid. return!
 }
 
 rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects, textures, vertices, vertex texture coords, and vertex normals.
