@@ -1,4 +1,4 @@
-CC = gcc
+CC = g++
 OPT = -std=c++11 
 #SRC = main vector3 point ray sphere rgb IO material light object cylinder
 #CPP = (SRC:=.cpp)
@@ -7,7 +7,7 @@ OPT = -std=c++11
 
 raytrace: bin/raytrace
 
-bin/raytrace: obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o obj/IO.o obj/material.o obj/light.o obj/object.o obj/cylinder.o bin/ obj/
+bin/raytrace: obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o obj/IO.o obj/material.o obj/light.o obj/object.o obj/cylinder.o obj/texture.o obj/triangle.o bin/ obj/
 	$(CC) -o bin/raytrace obj/*.o
 
 obj/main.o: main.cpp | obj/
