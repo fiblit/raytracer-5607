@@ -1,4 +1,8 @@
 #include "IO.h"
+#include "object.h"
+#include "sphere.h"
+#include "cylinder.h"
+#include "triangle.h"
 
 using namespace std;
 
@@ -354,7 +358,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             try
             {
                 double *coords = getDoubleParams(2, inFileLine);//might throw
-                triangle::vertexTexture uv;
+                textureCoord uv;
                 uv.u = coords[0];
                 uv.v = coords[1];
                 (*fd.vTextures).push_back (uv);
@@ -385,6 +389,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         }
         else if (keyword == "f")
         {
+            if (!kwdIsDef[MTLCOLOR])
+                return errMsg(MSSKWD,"Need mtlcolor before this line @ Line number: " + to_string(lineNum));
+
             int vParams[3] = {-1, -1, -1};
             int vtParams[3] = {-1, -1, -1};
             int vnParams[3] = {-1, -1, -1};
@@ -409,7 +416,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     if (!isInt(vertexParam[0]))
                         return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
 
-                    vParams[i] = atoi(vertexParam[0].c_str());
+                    vParams[i] = atoi(vertexParam[0].c_str()) - 1;//-1 because of obj format
+
+                    if (vParams[i] < 0 || vParams[i] > (int)(*fd.vertices).size() - 1)
+                        return errMsg(INVPRM, "vertexIndex out of range 1-#v's @ Line number: " + to_string(lineNum));
                 }
                 else if (vertexParam.size() == 2)//v/vt format
                 {
@@ -423,8 +433,13 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     if (!isInt(vertexParam[1]))
                         return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
 
-                    vParams[i] = atoi(vertexParam[0].c_str());
-                    vtParams[i] = atoi(vertexParam[1].c_str());
+                    vParams[i] = atoi(vertexParam[0].c_str()) - 1;
+                    vtParams[i] = atoi(vertexParam[1].c_str()) - 1;
+
+                    if (vParams[i] < 0 || vParams[i] > (int)(*fd.vertices).size() - 1)
+                        return errMsg(INVPRM, "vertexIndex out of range 1-#v's @ Line number: " + to_string(lineNum));
+                    if (vtParams[i] < 0 || vtParams[i] > (int)(*fd.vTextures).size() - 1)
+                        return errMsg(INVPRM, "vTextureIndex out of range 1-#vt's @ Line number: " + to_string(lineNum));
                 }
                 else if (vertexParam.size() == 3)// v/(vt)/vn format
                 {
@@ -451,12 +466,19 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     if (hasVt)
                         vtParams[i] = atoi(vertexParam[1].c_str());
                     vnParams[i] = atoi(vertexParam[2].c_str());
+
+                    if (vParams[i] < 0 || vParams[i] > (int)(*fd.vertices).size() - 1)
+                        return errMsg(INVPRM, "vertexIndex out of range 1-#v's @ Line number: " + to_string(lineNum));
+                    if (hasVt && (vtParams[i] < 0 || vtParams[i] > (int)(*fd.vTextures).size() - 1))
+                        return errMsg(INVPRM, "vertexIndex out of range 1-#vt's @ Line number: " + to_string(lineNum));
+                    if (vnParams[i] < 0 || vnParams[i] > (int)(*fd.vNormals).size() - 1)
+                        return errMsg(INVPRM, "vertexIndex out of range 1-#vn's @ Line number: " + to_string(lineNum));
                 }
                 else
                     return errMsg(INVPRM, "Usage \'f v1 v2 v3\' or \'f v1//vn1 v2//vn2 v3//vn3\' or \'f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3\' @ Line number: " + to_string(lineNum));
             }
 
-            (*fd.faces).push_back(triangle(vParams, vtParams, vnParams));
+            (*fd.objects).push_back(new triangle(vParams, vtParams, vnParams, mtlcolor));
 
             //No deletes since the params aren't on the heap this time :P
         }

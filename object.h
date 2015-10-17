@@ -6,21 +6,15 @@
 #include "ray.h"
 #include "light.h"
 #include "texture.h"
+#include "IO.h"
 
 using namespace std;
 
 class object
 {
     public:
-        //object();
-        virtual bool intersect(ray rr, double &t)=0;
-        //{
-        //    return false;
-        //}
-        virtual rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures)=0;
-        //{
-        //   return rgb();
-        //}
+        virtual bool intersect(ray rr, double &t, fileData_t *fd)=0;
+        virtual rgb shadeRay(ray rr, double t, fileData_t *fd)=0;
 };
 
 #endif // OBJECT_H

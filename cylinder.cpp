@@ -13,7 +13,7 @@ cylinder::cylinder(double u, double v, double radius, double minw, double maxw, 
     this->mtl = mtl;
 }
 
-bool cylinder::intersect(ray rr, double &t)
+bool cylinder::intersect(ray rr, double &t, fileData *fd)//fd for compatibility
 {
     point rloc = rr.getLoc();
     vector3 rdir = rr.getDir();
@@ -86,7 +86,7 @@ bool cylinder::intersect(ray rr, double &t)
     return true; //intersection at t
 }
 
-rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures)
+rgb cylinder::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
@@ -103,7 +103,7 @@ rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> o
     vector3 n = (inter.subtract(cen)).fscale(radius);
     vector3 v = rr.getDir() * (-1);//TO the viewer
     //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
-    for (light lit : lights)
+    for (light lit : *(fd->lights))
     {
         vector3 l;
         if (lit.getIsPnt())
@@ -116,10 +116,10 @@ rgb cylinder::shadeRay(ray rr, double t, vector<light> lights, vector<object*> o
 
         int shadow = 1;
         ray shadowrr(inter, l);
-        for(object* obj: objects)//for each sphere (object) in scene
+        for(object* obj: *(fd->objects))//for each sphere (object) in scene
         {
             double tlig;
-            if(obj->intersect(shadowrr, tlig))//if path to light interesects some sphere
+            if(obj->intersect(shadowrr, tlig, fd))//if path to light interesects some sphere
             {
                 if(lit.getIsPnt())
                 {

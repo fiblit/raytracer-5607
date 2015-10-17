@@ -6,6 +6,7 @@
 #include "light.h"
 #include "material.h"
 #include "object.h"
+#include "IO.h"
 
 class cylinder: public object
 {
@@ -13,8 +14,8 @@ class cylinder: public object
         enum class cylTypes : char {X = 'x', Y, Z};
         cylinder();
         cylinder(double u, double v, double radius, double minw, double maxw, cylTypes type, material mtl);
-        bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures);
+        bool intersect(ray rr, double &t, fileData *fd);
+        rgb shadeRay(ray rr, double t, fileData *fd);//fd for lights, objects(,textures)
         double getRadius();
         double getU();
         double getV();

@@ -12,7 +12,7 @@ sphere::sphere(point loc, double radius, material mtl, int texIndex)
 
 //Determines if the ray rr intersects this sphere.
 //If so, it will put the closest parametric value, for the equation of rr, into t.
-bool sphere::intersect(ray rr, double &t)
+bool sphere::intersect(ray rr, double &t, fileData *fd)//fd for compatibility
 {
     point rloc = rr.getLoc();
     vector3 rdir = rr.getDir();
@@ -45,8 +45,8 @@ bool sphere::intersect(ray rr, double &t)
 }
 
 #include <iostream>
+rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, textures
 
-rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures)
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
@@ -67,11 +67,11 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> obj
         double vTex = phi / PI;
         double uTex = theta / (2 * PI);
 
-        diffuse = textures[texIndex].getImg()[(int)(0.5 + vTex * (textures[texIndex].getHeight() - 1))][(int)(0.5 + uTex * (textures[texIndex].getWidth() - 1))];
+        diffuse = (*(fd->textures))[texIndex].getImg()[(int)(0.5 + vTex * ((*(fd->textures))[texIndex].getHeight() - 1))][(int)(0.5 + uTex * ((*(fd->textures))[texIndex].getWidth() - 1))];
     }
     rgb color = diffuse * mtl.getka();
     //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
-    for (light lit : lights)
+    for (light lit : *(fd->lights))
     {
         vector3 l;
         if (lit.getIsPnt())
@@ -84,10 +84,10 @@ rgb sphere::shadeRay(ray rr, double t, vector<light> lights, vector<object*> obj
 
         int shadow = 1;
         ray shadowrr(inter, l);
-        for(object* obj: objects)//for each sphere (object) in scene
+        for(object* obj: *(fd->objects))//for each sphere (object) in scene
         {
             double tlig;
-            if(obj->intersect(shadowrr, tlig))//if path to light interesects some sphere
+            if(obj->intersect(shadowrr, tlig, fd))//if path to light interesects some sphere
             {
                 if(lit.getIsPnt())
                 {

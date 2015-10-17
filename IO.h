@@ -5,14 +5,20 @@
 #include <fstream>
 #include <vector>
 #include <string>
+//#include "object.h"
+class object;
 #include "point.h"
-#include "sphere.h"
-#include "cylinder.h"
+//#include "sphere.h"
+class sphere;
+//#include "cylinder.h"
+class cylinder;
 #include "vector3.h"
 #include "rgb.h"
 #include "light.h"
 #include "texture.h"
-#include "triangle.h"
+//#include "triangle.h"
+class triangle;
+#include "textureCoord.h"
 
 using namespace std;
 
@@ -36,9 +42,8 @@ typedef struct fileData
     vector<light> *lights;
     vector<texture> *textures;
     vector<point> *vertices;
-    vector<triangle::vertexTexture> *vTextures;
+    vector<textureCoord> *vTextures;
     vector<vector3> *vNormals;
-    vector<triangle> *faces;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);
 int *getIntParams(int n, string &line);
@@ -46,5 +51,6 @@ double *getDoubleParams(int n, string &line);
 string *getStringParams(int n, string &line);
 texture getTexture(ifstream &texFile);
 void writeOutFile(string fileName, rgb **imgBuf, int imgWidth, int imgHeight);
+
 
 #endif // IO_H

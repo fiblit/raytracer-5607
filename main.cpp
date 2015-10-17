@@ -74,9 +74,8 @@ int main(int argc, char *argv[])
     vector<light> lights;
     vector<texture> textures;
     vector<point> vertices;
-    vector<triangle::vertexTexture> vTextures;
+    vector<textureCoord> vTextures;
     vector<vector3> vNormals;
-    vector<triangle> faces;
     //init fileData
     fileData_t fd;
     fd.eye = &eye;
@@ -93,7 +92,6 @@ int main(int argc, char *argv[])
     fd.vertices = &vertices;
     fd.vTextures = &vTextures;
     fd.vNormals = &vNormals;
-    fd.faces = &faces;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
     inFile.close();
@@ -145,14 +143,14 @@ int main(int argc, char *argv[])
             for(int i = 0; i < (int)objects.size(); i++)//for each sphere (object) in scene
             {
                 double t;
-                if(objects[i]->intersect(curRay,t) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
+                if(objects[i]->intersect(curRay, t, &fd) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
                 {
                     closestInter = t;
                     closest = i;
                 }
             }
             if (closest!=-1)
-                imgBuf[y][x] = objects[closest]->shadeRay(curRay, closestInter, lights, objects, textures);
+                imgBuf[y][x] = objects[closest]->shadeRay(curRay, closestInter, &fd);
         }
     }
 

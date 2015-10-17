@@ -10,6 +10,7 @@
 #include "light.h"
 #include "object.h"
 #include "texture.h"
+#include "IO.h"
 
 using namespace std;
 
@@ -20,8 +21,8 @@ class sphere: public object
     public:
         sphere();
         sphere(point loc, double radius, material mtl, int texIndex);
-        bool intersect(ray rr, double &t);
-        rgb shadeRay(ray rr, double t, vector<light> lights, vector<object*> objects, vector<texture> textures);
+        bool intersect(ray rr, double &t, fileData_t *fd);
+        rgb shadeRay(ray rr, double t, fileData_t *fd);//fd for lights, objects, textures
         point getLoc();
         double getRadius();
         material getMtl();
