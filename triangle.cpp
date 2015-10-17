@@ -123,28 +123,24 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
     vector3 e1 = v1.subtract(v0);
     vector3 e2 = v2.subtract(v0);
     vector3 n;
+    double alpha = 1 - beta - gamma;
 
     if (vn[0] > -1)//vertex normals were defined. (If any aren't -1, they all aren't)
-        n = (fd->vNormals->at(vn[0])) * (1 - beta - gamma) + (fd->vNormals->at(vn[1])) * beta + (fd->vNormals->at(vn[2])) * gamma;
+        n = (fd->vNormals->at(vn[0])) * alpha + (fd->vNormals->at(vn[1])) * beta + (fd->vNormals->at(vn[2])) * gamma;
     else
         n = e1.crossProduct(e2);
     n = n.unit();
     vector3 v = rr.getDir() * (-1);//TO the viewer
 
-    rgb diffuse = mtl.getOd();
-    /*if (texIndex == -1)
-        diffuse = mtl.getOd();
-    else
+    rgb diffuse;
+    if (vt[0] > -1)
     {
-        double theta = atan2(n.getY(), n.getX());
-        double phi = acos(n.getZ());
-        if(theta < 0)
-            theta += 2 * PI;
-        double vTex = phi / PI;
-        double uTex = theta / (2 * PI);
-
+        double vTex = alpha * (fd->vTextures->at(vt[0])).u + beta * (fd->vTextures->at(vt[1])).u + gamma * (fd->vTextures->at(vt[2])).u;
+        double uTex = alpha * (fd->vTextures->at(vt[0])).v + beta * (fd->vTextures->at(vt[1])).v + gamma * (fd->vTextures->at(vt[2])).v;
         diffuse = (*(fd->textures))[texIndex].getImg()[(int)(0.5 + vTex * ((*(fd->textures))[texIndex].getHeight() - 1))][(int)(0.5 + uTex * ((*(fd->textures))[texIndex].getWidth() - 1))];
-    }*/
+    }
+    else
+        diffuse = mtl.getOd();
     rgb color = diffuse * mtl.getka();
 
     for (light lit : *(fd->lights))
