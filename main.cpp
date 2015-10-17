@@ -97,32 +97,6 @@ int main(int argc, char *argv[])
     if ((errval = getInFileData(inFile, fd)))
         return errval;
     inFile.close();
-    /*
-    //Scene Debug
-    cout << "width: " << imgWidth << "\n";
-    cout << "height: " << imgHeight << "\n";
-    cout << "eye: " << eye.getX() << " : " << eye.getY() << " : " << eye.getZ() << "\n";
-    cout << "viewdir: " << viewdir.getX() << " : " << viewdir.getY() << " : " << viewdir.getZ() << "\n";
-    cout << "updir: " << updir.getX() << " : " << updir.getY() << " : " << updir.getZ() << "\n";
-    cout << "fovh: " << fovh << "\n";
-    cout << "bkgcolor: " << bkgcolor.getR() << " : " << bkgcolor.getG() << " : " << bkgcolor.getB() << "\n";
-    for(sphere s : objects)//I don't think this works anymore.
-    {
-        cout << "sphere: " << s.getLoc().getX() << " : " << s.getLoc().getY() << " : " << s.getLoc().getZ() << " : "
-            << s.getRadius() << " : "
-            << s.getMtl().getOd().getR() << " : " << s.getMtl().getOd().getG() << " : " << s.getMtl().getOd().getB() << " : "
-            << s.getMtl().getOs().getR() << " : " << s.getMtl().getOs().getG() << " : " << s.getMtl().getOs().getB() << " : "
-            << s.getMtl().getka() << " : " << s.getMtl().getkd() << " : " << s.getMtl().getks() << " : "
-            << s.getMtl().getn() << "\n";
-    }
-    for(light l : lights)
-    {
-        cout << "light: " << l.getLoc().getX() << " : " << l.getLoc().getY() << " : " << l.getLoc().getZ() << " : "
-            << l.getIsDir() << " : " << l.getColor().getR() << " : " << l.getColor().getG() << " : " << l.getColor().getB() << "\n";
-    }
-    cout << endl;
-    //end Scene Debug
-    */
 
     //Image Computations
     rgb **imgBuf = new rgb*[imgHeight];

@@ -389,11 +389,18 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             int vtParams[3] = {-1, -1, -1};
             int vnParams[3] = {-1, -1, -1};
             bool hasVt;
+            int formatSplitSize;
 
             for (int i = 0; i < 3; i++) //handle the varying syntax of 'f' (which screwed with my modularity)
             {
                 string param = getWord(inFileLine);
                 vector<string> vertexParam = split(param, "/");
+
+                if (i == 0)
+                    formatSplitSize = vertexParam.size();
+                else if ((int)vertexParam.size() != formatSplitSize)
+                    return errMsg(INVPRM, "Please use consistent format for the face @ line number: " + to_string(lineNum));
+
                 if (vertexParam.size() == 1)//v1 v2 v3 format
                 {
                     if (vertexParam[0] == "")
@@ -437,7 +444,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                         return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
                     if (hasVt && !isInt(vertexParam[1]))//need to make sure we're doing vt
                         return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
-                    if (!isInt(vertexParam[3]))
+                    if (!isInt(vertexParam[2]))
                         return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
 
                     vParams[i] = atoi(vertexParam[0].c_str());
@@ -608,6 +615,7 @@ string getWord(string &line) //So it turns out that C++ already has a way to do 
 vector<string> split(string &str, const string delims)
 {
     vector<string> result;
+    bool endNull = false;
     while(!str.empty())
     {
         string word = "";
@@ -617,9 +625,15 @@ vector<string> split(string &str, const string delims)
             word+=str[i];
             i++;
         }
+        if(delims.find(str[i])!=string::npos && i==(int)str.length()-1)//this is an edge case where something like "1,2," should be ("1","2","") but is ("1","2")
+            endNull = true;
+        if (delims.find(str[i])!=string::npos)
+            i++;
         str = &str[i];//Update line
         result.push_back(word);
     }
+    if (endNull)
+        result.push_back("");
     return result;
 }
 
