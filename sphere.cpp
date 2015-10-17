@@ -44,9 +44,7 @@ bool sphere::intersect(ray rr, double &t, fileData *fd)//fd for compatibility
     return true; //intersection at t
 }
 
-#include <iostream>
 rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, textures
-
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
@@ -116,15 +114,6 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, te
             color.setG(1.0);
         if (color.getB() > 1.0)
             color.setB(1.0);
-        //cout << "\nlight";
-        //cout << "n: " << n.getX() << " : " << n.getY() << " : " << n.getZ() << endl;
-        //cout << "v: " << v.getX() << " : " << v.getY() << " : " << v.getZ() << endl;
-        //cout << "l: " << l.getX() << " : " << l.getY() << " : " << l.getZ() << endl;
-        //cout << "h: " << h.getX() << " : " << h.getY() << " : " << h.getZ() << endl;
-        //rgb d = (mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l))));
-        //rgb s = (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())));
-        //cout << "d: " << d.getR() << " : " << d.getG() << " : " << d.getB() << endl;
-        //cout << "s: " << s.getR() << " : " << s.getG() << " : " << s.getB() << endl;
     }
 
     return color;

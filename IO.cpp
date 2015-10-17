@@ -462,10 +462,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     if (!isInt(vertexParam[2]))
                         return errMsg(INVPRM, "Invalid type (use integers) @ Line number: " + to_string(lineNum));
 
-                    vParams[i] = atoi(vertexParam[0].c_str());
+                    vParams[i] = atoi(vertexParam[0].c_str()) - 1;
                     if (hasVt)
-                        vtParams[i] = atoi(vertexParam[1].c_str());
-                    vnParams[i] = atoi(vertexParam[2].c_str());
+                        vtParams[i] = atoi(vertexParam[1].c_str()) - 1;
+                    vnParams[i] = atoi(vertexParam[2].c_str()) - 1;
 
                     if (vParams[i] < 0 || vParams[i] > (int)(*fd.vertices).size() - 1)
                         return errMsg(INVPRM, "vertexIndex out of range 1-#v's @ Line number: " + to_string(lineNum));
