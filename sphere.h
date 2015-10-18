@@ -21,6 +21,7 @@ class sphere: public object
     public:
         sphere();
         sphere(point loc, double radius, material mtl, int texIndex);
+        ~sphere();
         bool intersect(ray rr, double &t, fileData_t *fd);
         rgb shadeRay(ray rr, double t, fileData_t *fd);//fd for lights, objects, textures
         point getLoc();

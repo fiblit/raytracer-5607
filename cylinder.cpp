@@ -13,6 +13,9 @@ cylinder::cylinder(double u, double v, double radius, double minw, double maxw, 
     this->mtl = mtl;
 }
 
+
+cylinder::~cylinder() { }
+
 bool cylinder::intersect(ray rr, double &t, fileData *fd)//fd for compatibility
 {
     point rloc = rr.getLoc();

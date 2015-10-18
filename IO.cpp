@@ -110,6 +110,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 double *params = getDoubleParams(3,inFileLine);//might throw
                 *fd.updir = vector3(params[0],params[1],params[2]);
                 kwdIsDef[UPDIR] = true;
+
+                delete[] params;
             }
             catch(errNum e)
             {
@@ -387,7 +389,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             if ((*fd.vNormals)[(*fd.vNormals).size() - 1].getX() == 0 && (*fd.updir).getY() == 0 && (*fd.updir).getZ() == 0) //validate value
                 return errMsg(INVPRM,"vn is the zero vector @ Line number: " + to_string(lineNum));
         }
-        else if (keyword == "f")
+        else if (keyword == "f") // this one got kinda big because getDoubleParams and getIntParams couldn't be used anymore.
         {
             if (!kwdIsDef[MTLCOLOR])
                 return errMsg(MSSKWD,"Need mtlcolor before this line @ Line number: " + to_string(lineNum));
@@ -478,7 +480,11 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     return errMsg(INVPRM, "Usage \'f v1 v2 v3\' or \'f v1//vn1 v2//vn2 v3//vn3\' or \'f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3\' @ Line number: " + to_string(lineNum));
             }
 
-            (*fd.objects).push_back(new triangle(vParams, vtParams, vnParams, mtlcolor));
+            int texIndex = -1;//-1 means no texture is defined (NULL)
+            if (kwdIsDef[TEXTURE])
+                texIndex = (*fd.textures).size() - 1;
+
+            (*fd.objects).push_back(new triangle(vParams, vtParams, vnParams, mtlcolor, texIndex));
 
             //No deletes since the params aren't on the heap this time :P
         }
@@ -491,6 +497,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
         getline(inFile,inFileLine);
         lineNum++;
     }
+
     //check that the viewing params have been defined
     string kwdString[6] = {"eye","viewdir","updir","fovh","imsize","bkgcolor"};
     for (int i = 0; i <= BKGCOLOR ; i++)
@@ -562,6 +569,7 @@ texture getTexture(ifstream &texFile)
     int width = header[0];
     int height = header[1];
     int value = header[2];
+    delete[] header;
 
     rgb **textureImg = new rgb*[height];
     for (int i = 0; i < height; i++)
@@ -582,6 +590,10 @@ texture getTexture(ifstream &texFile)
         getline(texFile, r);
         getline(texFile, g);
         getline(texFile, b);
+
+        delete[] pixelr;
+        delete[] pixelg;
+        delete[] pixelb;
     }
 
     return texture(textureImg, width, height);

@@ -154,6 +154,15 @@ int main(int argc, char *argv[])
         }
     }
 
+    for (object * obj : objects)
+        delete obj;
+    for (texture tex : textures)
+    {
+        for (int i = 0; i < tex.getHeight(); i++)
+            delete[] tex.getImg()[i];
+        delete[] tex.getImg();
+    }
+
     if (outFileName == "")//unspecified, save as same name in local directory
     {
         outFileName = inFileName.replace(inFileName.length()-4,inFileName.length()-1,".ppm");//change extension from .txt to .ppm

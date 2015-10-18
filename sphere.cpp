@@ -10,6 +10,8 @@ sphere::sphere(point loc, double radius, material mtl, int texIndex)
     this->texIndex = texIndex;
 }
 
+sphere::~sphere() { }
+
 //Determines if the ray rr intersects this sphere.
 //If so, it will put the closest parametric value, for the equation of rr, into t.
 bool sphere::intersect(ray rr, double &t, fileData *fd)//fd for compatibility

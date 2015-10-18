@@ -11,10 +11,9 @@
 class triangle: public object //equivalent to an 'f' in the input.
 {
     public:
-        triangle(material mtl);
-        triangle(int v[3], material mtl);
-        triangle(int v[3], int vn[3], material mtl);
-        triangle(int v[3], int vt[3], int vn[3], material mtl);
+        triangle();
+        triangle(int v[3], int vt[3], int vn[3], material mtl, int texIndex);
+        ~triangle();
         bool intersect(ray rr, double &t, fileData_t *fd);
         rgb shadeRay(ray rr, double t, fileData_t *fd);
         int getv(int i);

@@ -14,6 +14,7 @@ class cylinder: public object
         enum class cylTypes : char {X = 'x', Y, Z};
         cylinder();
         cylinder(double u, double v, double radius, double minw, double maxw, cylTypes type, material mtl);
+        ~cylinder();
         bool intersect(ray rr, double &t, fileData *fd);
         rgb shadeRay(ray rr, double t, fileData *fd);//fd for lights, objects(,textures)
         double getRadius();

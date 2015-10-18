@@ -1,39 +1,8 @@
 #include "triangle.h"
 
-triangle::triangle(material mtl)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        v[i] = -1;
-        vt[i] = -1;
-        vn[i] = -1;
-    }
-    this->mtl = mtl;
-}
+triangle::triangle() { }
 
-triangle::triangle(int v[3], material mtl)
-{
-    for (int i = 0; i < 3; i++)//deepcopy
-    {
-        this->v[i] = v[i];
-        vt[i] = -1;
-        vn[i] = -1;
-    }
-    this->mtl = mtl;
-}
-
-triangle::triangle(int v[3], int vn[3], material mtl)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        this->v[i] = v[i];
-        vt[i] = -1;
-        this->vn[i] = vn[i];
-    }
-    this->mtl = mtl;
-}
-
-triangle::triangle(int v[3], int vt[3], int vn[3], material mtl)
+triangle::triangle(int v[3], int vt[3], int vn[3], material mtl, int texIndex)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -42,7 +11,10 @@ triangle::triangle(int v[3], int vt[3], int vn[3], material mtl)
         this->vn[i] = vn[i];
     }
     this->mtl = mtl;
+    this->texIndex = texIndex;
 }
+
+triangle::~triangle() { }
 
 bool triangle::intersect(ray rr, double &t, fileData_t *fd)//fd for vertices
 {
@@ -108,7 +80,7 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
     vector3 v = rr.getDir() * (-1);//TO the viewer
 
     rgb diffuse;
-    if (vt[0] > -1)
+    if (vt[0] > -1 && texIndex != -1)//we need vt defined and there to be a texture
     {
         double uTex = alpha * (fd->vTextures->at(vt[0])).u + beta * (fd->vTextures->at(vt[1])).u + gamma * (fd->vTextures->at(vt[2])).u;
         double vTex = alpha * (fd->vTextures->at(vt[0])).v + beta * (fd->vTextures->at(vt[1])).v + gamma * (fd->vTextures->at(vt[2])).v;

@@ -1,6 +1,5 @@
 Draw&Make/Find (obj) Scenes
-Data cleanup (need to delete stuff here and there, run valgrind)
-Change each sphere holding material to a reference to a material table. (too much space)
+(Optional) Change each sphere holding material to a reference to a material table. (too much space)
 (Optional) Remove textureCoord (Not really helpful :P)
 (Optional) Add -o delimiter for outputs in the command-line. (e.g. raytrace inputfiles -o outputfiles)
 (Optional) Increase makefile generalization (e.g. put source in src. Essentially organize.)
