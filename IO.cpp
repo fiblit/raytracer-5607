@@ -488,7 +488,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
             //No deletes since the params aren't on the heap this time :P
         }
-        else if (keyword[0] == "#")//I AM A COMMENT
+        else if (keyword[0] == '#')//I AM A COMMENT
             ;//                     ^^^ He is a comment
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
             ; //Continue to next line

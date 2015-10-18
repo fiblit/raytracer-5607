@@ -1,4 +1,3 @@
-Draw&Make/Find (obj) Scenes
 (Optional) Change each sphere holding material to a reference to a material table. (too much space)
 (Optional) Remove textureCoord (Not really helpful :P)
 (Optional) Add -o delimiter for outputs in the command-line. (e.g. raytrace inputfiles -o outputfiles)
