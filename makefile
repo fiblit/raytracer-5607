@@ -1,13 +1,13 @@
 CC = g++
-OPT = -std=c++11 
-#SRC = main vector3 point ray sphere rgb IO material light object cylinder
+OPT = -std=c++11
+#SRC = main vector3 point ray sphere rgb IO material light object cylinder texture triangle traceRay
 #CPP = (SRC:=.cpp)
 #OBJ = (SRC:=.o)
 #INC = (SRC:=.h)
 
 raytrace: bin/raytrace
 
-bin/raytrace: obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o obj/IO.o obj/material.o obj/light.o obj/object.o obj/cylinder.o obj/texture.o obj/triangle.o bin/ obj/
+bin/raytrace:  bin/ obj/ obj/main.o obj/vector3.o obj/point.o obj/ray.o obj/sphere.o obj/rgb.o obj/IO.o obj/material.o obj/light.o obj/object.o obj/cylinder.o obj/texture.o obj/triangle.o obj/traceRay.o
 	$(CC) -o bin/raytrace obj/*.o
 
 obj/main.o: main.cpp | obj/
@@ -36,6 +36,8 @@ obj/texture.o: texture.cpp texture.h | obj/
 	$(CC) $(OPT) -c texture.cpp -o obj/texture.o
 obj/triangle.o: triangle.cpp triangle.h | obj/
 	$(CC) $(OPT) -c triangle.cpp -o obj/triangle.o
+obj/traceRay.o: traceRay.cpp traceRay.h | obj/
+	$(CC) $(OPT) -c traceRay.cpp -o obj/traceRay.o
 
 obj/:
 	mkdir obj

@@ -4,7 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <vector>
-#include <limits>
+
 //#include "vector3.h"
 //#include "point.h"
 #include "sphere.h"
@@ -14,6 +14,7 @@
 #include "IO.h"
 #include "texture.h"
 #include "triangle.h"
+#include "traceRay.h"
 
 using namespace std;
 
@@ -133,24 +134,14 @@ int main(int argc, char *argv[])
         for(int x = 0; x < imgWidth; x++)
         {
             imgBuf[y][x] = bkgcolor;//initialize to background
-            int closest = -1;
-            double closestInter = numeric_limits<double>::infinity();
             ray curRay;
             if (parallel)
                 curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
             else
                 curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            for(int i = 0; i < (int)objects.size(); i++)//for each object in scene
-            {
-                double t;
-                if(objects[i]->intersect(curRay, t, &fd) && (closestInter > t))//returns true if intersected, assigns closer (non-neg) intersection to t
-                {
-                    closestInter = t;
-                    closest = i;
-                }
-            }
-            if (closest!=-1)
-                imgBuf[y][x] = objects[closest]->shadeRay(curRay, closestInter, &fd);
+            /* trace ray begin */
+            traceRay(curRay, &fd, imgBuf[y][x]);
+            /* trace ray end */
         }
     }
 
