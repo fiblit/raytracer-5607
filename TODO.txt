@@ -1,9 +1,21 @@
+Refactor for TraceRay
+Clarify details of the below items
+Add transparency to spheres
+Add transparency to triangles
+Add transparency to cylinders
+Add reflection to spheres
+Add reflection to triangles
+Add reflection to cylinders
+Add distributed ray tracing
+(Optional) Add keywords to make distributed ray tracing optional
+
 (Optional) Add -o delimiter for outputs in the command-line. (e.g. raytrace inputfiles -o outputfiles)
 (Optional) Increase makefile generalization (e.g. put source in src. Essentially organize.)
 (Optional) Add Texture tiling
 (Optional) Change each sphere holding material to a reference to a material table. (too much space)
 (Optional) Remove textureCoord (Not really helpful :P)
 (Optional) Add cylinder Texturing (Is "impossible" for infinite cylinders)
+
 (delayed) Add optional finite parameters to cylinders
 (indefinitely delayed) Add endcaps to cylinders (TODO fix bug, start from scratch)
 
