@@ -1,9 +1,35 @@
-(Optional) Change each sphere holding material to a reference to a material table. (too much space)
-(Optional) Remove textureCoord (Not really helpful :P)
+Refactor for TraceRay
+Fix numerical error bugs
+Add new properties to mtlcolor
+Add reflection to spheres
+Add reflection to triangles
+Add reflection to cylinders
+Handle recursive termination in (TraceRay or ShadeRay ?)
+Add transparency to spheres
+Add transparency to triangles
+Add transparency to cylinders
+  Add TIR handling for transparency
+  Add soft shadows for transparency
+Handle overflow/numerical error
+(EC) Add distributed ray tracing
+(EC) Add viewdist keyword
+(EC) Add depth of field effects
+(Optional) Add stack for hollow spheres
+Model that awesome scene idea (Battle of the Hill)
+Model that OTHER scene idea (Constellation room)
+(Optional) Add handler functions for getInFileData
+(Optional) Add keywords to make distributed ray tracing optional
+  ^^ This may include adding more to mtlcolor or a mtlprop class/keyword
+Clean up memory errors
+
 (Optional) Add -o delimiter for outputs in the command-line. (e.g. raytrace inputfiles -o outputfiles)
 (Optional) Increase makefile generalization (e.g. put source in src. Essentially organize.)
+(Optional) Add Texture tiling
+(Optional) Change each sphere holding material to a reference to a material table. (too much space)
+(Optional) Remove textureCoord (Not really helpful :P)
 (Optional) Add cylinder Texturing (Is "impossible" for infinite cylinders)
-(delayed) Add optional finite parameters to cylinders
+
+(indefinitely delayed) Add optional finite parameters to cylinders
 (indefinitely delayed) Add endcaps to cylinders (TODO fix bug, start from scratch)
 
 And, of course, everything else!
