@@ -2,7 +2,7 @@
 
 material::material() { }
 
-material::material(rgb Od, rgb Os, double ka, double kd, double ks, int n)
+material::material(rgb Od, rgb Os, double ka, double kd, double ks, int n, double opacity, double eta)
 {
     this->Od = Od;
     this->Os = Os;
@@ -10,6 +10,8 @@ material::material(rgb Od, rgb Os, double ka, double kd, double ks, int n)
     this->kd = kd;
     this->ks = ks;
     this->n = n;
+    this->opacity = opacity;
+    this->eta = eta;
 }
 
 rgb material::getOd()
@@ -42,6 +44,16 @@ int material::getn()
     return n;
 }
 
+double material::getOpacity()
+{
+    return opacity;
+}
+
+double material::getEta()
+{
+    return eta;
+}
+
 void material::setOd(rgb Od)
 {
     this->Od = Od;
@@ -70,4 +82,14 @@ void material::setks(double ks)
 void material::setn(int n)
 {
     this->n = n;
+}
+
+void material::setOpacity(double opacity)
+{
+    this->opacity = opacity;
+}
+
+void material::setEta(double eta)
+{
+    this->eta = eta;
 }
