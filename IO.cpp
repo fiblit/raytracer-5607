@@ -98,7 +98,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e,"Usage \'viewdir x y z\' @ Line number: " + to_string(lineNum));
             }
 
-            if ((*fd.viewdir).getX() == 0 && (*fd.viewdir).getY() == 0 && (*fd.viewdir).getZ() == 0) //validate value
+            if (abs((*fd.viewdir).getX()) < EPSILON &&
+                abs((*fd.viewdir).getY()) < EPSILON &&
+                abs((*fd.viewdir).getZ()) < EPSILON) //validate value
                 return errMsg(INVPRM,"viewdir is the zero vector @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "updir")
@@ -118,7 +120,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e,"Usage \'updir x y z\' @ Line number: " + to_string(lineNum));
             }
 
-            if ((*fd.updir).getX() == 0 && (*fd.updir).getY() == 0 && (*fd.updir).getZ() == 0) //validate value
+            if (abs((*fd.updir).getX()) < EPSILON &&
+                abs((*fd.updir).getY()) < EPSILON &&
+                abs((*fd.updir).getZ()) < EPSILON) //validate value
                 return errMsg(INVPRM,"updir is the zero vector @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "fovh")
@@ -267,7 +271,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             }
 
             light l = (*fd.lights)[(*fd.lights).size() - 1];//for convenience
-            if (!l.getIsPnt() && l.getLoc().getX() == 0 && l.getLoc().getY() == 0 && l.getLoc().getZ() == 0 )
+            if (!l.getIsPnt() &&
+                abs(l.getLoc().getX()) < EPSILON &&
+                abs(l.getLoc().getY()) < EPSILON &&
+                abs(l.getLoc().getZ()) < EPSILON)
                 return errMsg(INVPRM,"light dir is the zero vector @ Line number: " + to_string(lineNum));
             if (l.getColor().getR() > 1.0 || l.getColor().getR() < 0.0)
                 return errMsg(INVPRM,"light red is out of range [0,1] @ Line number: " + to_string(lineNum));
@@ -386,7 +393,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e,"Usage \'vn dx dy dz\' @ Line number: " + to_string(lineNum));
             }
 
-            if ((*fd.vNormals)[(*fd.vNormals).size() - 1].getX() == 0 && (*fd.updir).getY() == 0 && (*fd.updir).getZ() == 0) //validate value
+            if (abs( (*fd.vNormals)[(*fd.vNormals).size() - 1].getX() ) < EPSILON &&
+                abs( (*fd.vNormals)[(*fd.vNormals).size() - 1].getY() ) < EPSILON &&
+                abs( (*fd.vNormals)[(*fd.vNormals).size() - 1].getZ() ) < EPSILON) //validate value
                 return errMsg(INVPRM,"vn is the zero vector @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "f") // this one got kinda big because getDoubleParams and getIntParams couldn't be used anymore.

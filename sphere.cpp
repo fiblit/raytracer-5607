@@ -69,7 +69,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, te
 
         diffuse = (*(fd->textures))[texIndex].getImg()[(int)(0.5 + vTex * ((*(fd->textures))[texIndex].getHeight() - 1))][(int)(0.5 + uTex * ((*(fd->textures))[texIndex].getWidth() - 1))];
     }
-    rgb color = diffuse * mtl.getka();
+    rgb color = rgb();
     //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
     for (light lit : *(fd->lights))
     {
@@ -91,7 +91,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, te
             {
                 if(lit.getIsPnt())
                 {
-                    if (tlig > 0.000001 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
+                    if (tlig > EPSILON && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
                     {
                         shadow = 0;//then in shadow
                         break;
@@ -99,7 +99,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, te
                 }
                 else
                 {
-                    if(tlig > 0.000001) // in front of me for directional
+                    if(tlig > EPSILON) // in front of me for directional
                     {
                         shadow = 0;//then in shadow
                         break;
@@ -108,8 +108,11 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects, te
             }
         }
 
-        color = color + lit.getColor() * ((diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())))) * shadow;
-        //parenthesis are right     10   12         32   3         43      4                 5 4321   2         32   3         43      4   5                 6 54          543210
+        rgb acolor = diffuse * mtl.getka();
+        rgb dcolor = lit.getColor() * (diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l))));
+        rgb scolor = lit.getColor() * (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()))) * shadow;
+        color = acolor + dcolor + scolor;
+
         if (color.getR() > 1.0)
             color.setR(1.0);
         if (color.getG() > 1.0)

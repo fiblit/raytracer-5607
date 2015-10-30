@@ -7,6 +7,7 @@
 #include "material.h"
 #include "object.h"
 #include "IO.h"
+#include "constants.h"
 
 class cylinder: public object
 {

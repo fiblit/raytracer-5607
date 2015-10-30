@@ -15,10 +15,9 @@
 #include "texture.h"
 #include "triangle.h"
 #include "traceRay.h"
+#include "constants.h"
 
 using namespace std;
-
-//double const PI = 3.14159265358979323846264338327950288;//I actually know those digits by heart, I have it down to a little rhythm.
 
 int main(int argc, char *argv[])
 {
@@ -106,8 +105,8 @@ int main(int argc, char *argv[])
 
     //Viewing Window Compuatations
     vector3 u = viewdir.crossProduct(updir); //Find the vector horizontal to the window
-    if (u.length() == 0)//viewdir and updir were parallel
-        return errMsg(INVPRM,"viewdir and updir are parallel. Please offset updir");
+    if (abs(u.length() - EPSILON) < 0)//viewdir and updir were parallel
+        return errMsg(INVPRM, "viewdir and updir are parallel. Please offset updir");
     u = u.unit();
     vector3 nviewdir = viewdir.unit();
     vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
@@ -133,15 +132,13 @@ int main(int argc, char *argv[])
     {
         for(int x = 0; x < imgWidth; x++)
         {
-            imgBuf[y][x] = bkgcolor;//initialize to background
             ray curRay;
             if (parallel)
                 curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
             else
                 curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            /* trace ray begin */
+            imgBuf[y][x] = bkgcolor;//initialize to background
             traceRay(curRay, &fd, imgBuf[y][x]);
-            /* trace ray end */
         }
     }
 

@@ -7,6 +7,7 @@
 #include "material.h"
 #include "IO.h"
 #include "textureCoord.h"
+#include "constants.h"
 
 class triangle: public object //equivalent to an 'f' in the input.
 {

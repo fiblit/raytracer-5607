@@ -126,7 +126,7 @@ rgb cylinder::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects
             {
                 if(lit.getIsPnt())
                 {
-                    if (tlig > 0.000001 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
+                    if (tlig > EPSILON && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
                     {
                         shadow = 0;//then in shadow
                         break;
@@ -134,7 +134,7 @@ rgb cylinder::shadeRay(ray rr, double t, fileData *fd)//fd for lights, objects
                 }
                 else
                 {
-                    if(tlig > 0.000001) // in front of me for directional
+                    if(tlig > EPSILON) // in front of me for directional
                     {
                         shadow = 0;//then in shadow
                         break;

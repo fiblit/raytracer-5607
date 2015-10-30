@@ -19,6 +19,7 @@ class cylinder;
 //#include "triangle.h"
 class triangle;
 #include "textureCoord.h"
+#include "constants.h"
 
 using namespace std;
 

@@ -11,10 +11,11 @@
 #include "object.h"
 #include "texture.h"
 #include "IO.h"
+#include "constants.h"
+
 
 using namespace std;
 
-double const PI = 3.14159265358979323846264338327950288;
 
 class sphere: public object
 {
