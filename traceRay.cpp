@@ -4,7 +4,7 @@
 
 void traceRay(ray rr, fileData_t *fd, rgb &color, int depth)
 {
-    if (depth > 100)//recursive termination
+    if (depth > 50)//recursive termination
         return;
 
     vector<object *> objects = *(fd->objects);

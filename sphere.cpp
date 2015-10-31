@@ -55,11 +55,6 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
     vector3 n = (inter.subtract(loc)).fscale(radius);
     vector3 v = rr.getDir() * (-1);//TO the viewer
 
-    double etaIncident = 1.0; //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
-    double etaTransmit = mtl.getEta();
-    //Flipping n code
-    //flip etaTransmit etaIncident
-
     rgb diffuse;
     if (texIndex == -1)
         diffuse = mtl.getOd();
@@ -100,7 +95,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
                 {
                     if (tlig > 0 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
                     {
-                        shadow = 0;//then in shadow
+                        shadow = 0;
                         break;
                     }
                 }
@@ -108,7 +103,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
                 {
                     if(tlig > 0) // in front of me for directional
                     {
-                        shadow = 0;//then in shadow
+                        shadow = 0;
                         break;
                     }
                 }
@@ -131,12 +126,32 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
     rgb acolor = diffuse * mtl.getka();
     color = color + acolor;
 
+     //Check for overflow
+    if (color.getR() > 1.0)
+        color.setR(1.0);
+    if (color.getG() > 1.0)
+        color.setG(1.0);
+    if (color.getB() > 1.0)
+        color.setB(1.0);
+
     if (mtl.getEta() != -1 && mtl.getOpacity() != -1)//eta and opacity have been defined
     {
+        double etaIncident = 1.0; //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
+        double etaTransmit = mtl.getEta(); //Will vary for transmitted and stack
+
+        double cosIncident = v.dotProduct(n);
+        if (cosIncident < 0)//Backside of surface
+        {
+            n = n * -1;
+            cosIncident = v.dotProduct(n);//recalculate cosIncident
+            double t = etaIncident;//swap incident and transmit as we are on the inside of the surface, NOTE/TODO: This won't work for stack
+            etaIncident = etaTransmit;
+            etaTransmit = t;
+        }
+
         vector3 incident = v;
 
         //calculate reflected ray
-        double cosIncident = max(0.0, v.dotProduct(n));
         vector3 reflected = (n * 2 * cosIncident) - incident;
         ray reflecRay = ray(inter, reflected);
 
@@ -147,18 +162,39 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
         double factor_r = factor_0 + (1 - factor_0)*pow(1 - cosIncident, 5);//schlick approximation of fresnel reflectance
         color = color + rcolor * factor_r;
 
-        //transmitRay = ray();
-        //rgb tcolor = rgb();
-        //traceRay(transmitRay, fd, tcolor);
-    }
+         //Check for overflow
+        if (color.getR() > 1.0)
+            color.setR(1.0);
+        if (color.getG() > 1.0)
+            color.setG(1.0);
+        if (color.getB() > 1.0)
+            color.setB(1.0);
 
-    //Check for overflow
-    if (color.getR() > 1.0)
-        color.setR(1.0);
-    if (color.getG() > 1.0)
-        color.setG(1.0);
-    if (color.getB() > 1.0)
-        color.setB(1.0);
+        //calculate transmitted ray
+        double sinIncident = sqrt(1 - pow(cosIncident, 2));
+        double etaRatio = etaIncident/etaTransmit;
+        if (sinIncident <= etaRatio)
+        {
+            vector3 transmitted = (n * -1)
+                * sqrt(1 - (pow(etaRatio, 2) * (1 - pow(cosIncident, 2))))
+                + (n * cosIncident - incident) * etaRatio;
+            //vector3 transmitted = (n * (-1)) * sqrt(1 - pow(etaRatio, 2) * (1 - pow(cosIncident, 2))) + (n * cosIncident - incident) * etaRatio;
+            ray transmitRay(inter + transmitted * EPSILON, transmitted);
+
+            //get color for transmitted ray
+            rgb tcolor = rgb(0, 0, 0);
+            traceRay(transmitRay, fd, tcolor, depth);
+            color = color + tcolor * (1 - factor_r) * (1 - mtl.getOpacity());
+        }
+
+        //Check for overflow
+        if (color.getR() > 1.0)
+            color.setR(1.0);
+        if (color.getG() > 1.0)
+            color.setG(1.0);
+        if (color.getB() > 1.0)
+            color.setB(1.0);
+    }
 
     return color;
 }

@@ -1,4 +1,4 @@
-dd transparency to spheres
+(finish adding) transparency to spheres
 Add transparency to triangles
 Add transparency to cylinders
   Add TIR handling for transparency

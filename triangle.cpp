@@ -145,15 +145,15 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd, int depth)//fd for ligh
 
     if (mtl.getEta() != -1)//eta and opacity have been defined
     {
-        double etaIncident = mtl.getEta(); //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
-        double etaTransmit = 1.0;
+        double etaIncident = 1.0; //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
+        double etaTransmit = mtl.getEta();
         //Flipping n code
         //flip etaTransmit etaIncident
 
         vector3 incident = v;
 
         //calculate reflected ray
-        double cosIncident = max(0.0, v.dotProduct(n));
+        double cosIncident = v.dotProduct(n);
         vector3 reflected = (n * 2 * cosIncident) - incident;
         ray reflecRay = ray(inter, reflected);
 
