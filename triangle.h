@@ -8,6 +8,7 @@
 #include "IO.h"
 #include "textureCoord.h"
 #include "constants.h"
+#include "traceRay.h"
 
 class triangle: public object //equivalent to an 'f' in the input.
 {
@@ -16,7 +17,7 @@ class triangle: public object //equivalent to an 'f' in the input.
         triangle(int v[3], int vt[3], int vn[3], material mtl, int texIndex);
         ~triangle();
         bool intersect(ray rr, double &t, fileData_t *fd);
-        rgb shadeRay(ray rr, double t, fileData_t *fd);
+        rgb shadeRay(ray rr, double t, fileData_t *fd, int depth);
         int getv(int i);
         int getvt(int i);
         int getvn(int i);

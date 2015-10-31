@@ -8,6 +8,7 @@
 #include "object.h"
 #include "IO.h"
 #include "constants.h"
+#include "traceRay.h"
 
 class cylinder: public object
 {
@@ -17,7 +18,7 @@ class cylinder: public object
         cylinder(double u, double v, double radius, double minw, double maxw, cylTypes type, material mtl);
         ~cylinder();
         bool intersect(ray rr, double &t, fileData *fd);
-        rgb shadeRay(ray rr, double t, fileData *fd);//fd for lights, objects(,textures)
+        rgb shadeRay(ray rr, double t, fileData *fd, int depth);//fd for lights, objects(,textures)
         double getRadius();
         double getU();
         double getV();

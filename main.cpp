@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
             else
                 curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
             imgBuf[y][x] = bkgcolor;//initialize to background
-            traceRay(curRay, &fd, imgBuf[y][x]);
+            traceRay(curRay, &fd, imgBuf[y][x], 0);
         }
     }
 

@@ -53,12 +53,12 @@ bool triangle::intersect(ray rr, double &t, fileData_t *fd)//fd for vertices
     if (!(gamma >= 0 && gamma <= 1))// the equals are so the rays intersect edges (without them there are black spots on edges) (although, it turns out only one is nessecary)
         return false; // outside of triangle
     beta = (j*m + k*n + l*o)/s;
-    if (!(beta >= 0 && beta <= 1-gamma))
+    if (!(beta >= 0 && beta <= 1-gamma))//One equals between this line and the one above
         return false; //outside of triangle
     return true;//Nothing broke, so t is valid. return!
 }
 
-rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects, textures, vertices, vertex texture coords, and vertex normals.
+rgb triangle::shadeRay(ray rr, double t, fileData_t *fd, int depth)//fd for lights, objects, textures, vertices, vertex texture coords, and vertex normals.
 {
     /*
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]]
@@ -88,7 +88,7 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
     }
     else
         diffuse = mtl.getOd();
-    rgb color = diffuse * mtl.getka();
+    rgb color = rgb(0, 0, 0);
 
     for (light lit : *(fd->lights))
     {
@@ -102,7 +102,7 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
         h = h.unit();
 
         int shadow = 1;
-        ray shadowrr(inter, l);
+        ray shadowrr(inter + l*EPSILON, l);
         for(object* obj: *(fd->objects))//for each sphere (object) in scene
         {
             double tlig;
@@ -110,7 +110,7 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
             {
                 if(lit.getIsPnt())
                 {
-                    if (tlig > EPSILON && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
+                    if (tlig > 0 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
                     {
                         shadow = 0;//then in shadow
                         break;
@@ -118,7 +118,7 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
                 }
                 else
                 {
-                    if(tlig > EPSILON) // in front of me for directional
+                    if(tlig > 0) // in front of me for directional
                     {
                         shadow = 0;//then in shadow
                         break;
@@ -127,8 +127,11 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
             }
         }
 
-        color = color + lit.getColor() * ((diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)))) + (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())))) * shadow;
-        //parenthesis are right     10   12         32   3         43      4                 5 4321   2         32   3         43      4   5                 6 54          543210
+        rgb dcolor = diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)));
+        rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
+        color = color + lit.getColor() * (dcolor + scolor) * shadow;
+
+        //Check for overflow
         if (color.getR() > 1.0)
             color.setR(1.0);
         if (color.getG() > 1.0)
@@ -136,6 +139,43 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd)//fd for lights, objects
         if (color.getB() > 1.0)
             color.setB(1.0);
     }
+
+    rgb acolor = diffuse * mtl.getka();
+    color = color + acolor;
+
+    if (mtl.getEta() != -1)//eta and opacity have been defined
+    {
+        double etaIncident = mtl.getEta(); //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
+        double etaTransmit = 1.0;
+        //Flipping n code
+        //flip etaTransmit etaIncident
+
+        vector3 incident = v;
+
+        //calculate reflected ray
+        double cosIncident = max(0.0, v.dotProduct(n));
+        vector3 reflected = (n * 2 * cosIncident) - incident;
+        ray reflecRay = ray(inter, reflected);
+
+        //Get color for reflected ray
+        rgb rcolor = rgb(0, 0, 0);
+        traceRay(reflecRay, fd, rcolor, depth);
+        double factor_0 = pow(((etaTransmit - etaIncident)/(etaTransmit + etaIncident)), 2);
+        double factor_r = factor_0 + (1 - factor_0)*pow(1 - cosIncident, 5);//schlick approximation of fresnel reflectance
+        color = color + rcolor * factor_r;
+
+        //transmitRay = ray();
+        //rgb tcolor = rgb();
+        //traceRay(transmitRay, fd, tcolor);
+    }
+
+    //Check for overflow
+    if (color.getR() > 1.0)
+        color.setR(1.0);
+    if (color.getG() > 1.0)
+        color.setG(1.0);
+    if (color.getB() > 1.0)
+        color.setB(1.0);
 
     return color;
 }

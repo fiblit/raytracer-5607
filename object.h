@@ -15,7 +15,7 @@ class object
     public:
         virtual ~object();
         virtual bool intersect(ray rr, double &t, fileData_t *fd)=0;
-        virtual rgb shadeRay(ray rr, double t, fileData_t *fd)=0;
+        virtual rgb shadeRay(ray rr, double t, fileData_t *fd, int depth)=0;
 };
 
 #endif // OBJECT_H

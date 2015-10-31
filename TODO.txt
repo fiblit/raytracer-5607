@@ -1,8 +1,4 @@
-Add reflection to spheres
-Add reflection to triangles
-Add reflection to cylinders
-Handle recursive termination in (TraceRay or ShadeRay ?)
-Add transparency to spheres
+dd transparency to spheres
 Add transparency to triangles
 Add transparency to cylinders
   Add TIR handling for transparency

@@ -198,7 +198,27 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             {
                 double *params = getDoubleParams(9, inFileLine);//might throw
                 int *paramsI = getIntParams(1, inFileLine);//Since n should be int, not double.
-                double *alphaEta = getDoubleParams(2, inFileLine);
+                double *alphaEta;//alpha and eta are optional... TODO: I should make a function for that
+                try
+                {
+                    alphaEta = getDoubleParams(2, inFileLine); //this is what might throw
+                    if (mtlcolor.getOpacity() > 1.0 || mtlcolor.getOpacity() < 0.0)
+                        return errMsg(INVPRM, "mtlcolor opacity is out of range [0,1] @ Line number: " + to_string(lineNum));
+                    if (mtlcolor.getEta() < 0.0)
+                        return errMsg(INVPRM, "mtcolor eta is out of range [0,inf) @ Line number: " + to_string(lineNum));
+                }
+                catch(errNum e)
+                {
+                    if (e == MSSPRM)
+                    {
+                       alphaEta = new double[2];
+                       alphaEta[0] = -1;//Undefined
+                       alphaEta[1] = -1;//Undefined
+                    }
+                    else
+                        return errMsg(e,"Usage \'mtlcolor Dr Dg Db Sr Sg Sb ka kd ks n [α η]\' @ Line number: " + to_string(lineNum));
+
+                }
                 mtlcolor = material(rgb(params[0],params[1],params[2]), rgb(params[3],params[4],params[5]), params[6], params[7], params[8], paramsI[0], alphaEta[0], alphaEta[1]);
                 kwdIsDef[MTLCOLOR] = true;
 
@@ -208,7 +228,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             }
             catch(errNum e)
             {
-                return errMsg(e,"Usage \'mtlcolor Dr Dg Db Sr Sg Sb ka kd ks n α η\' @ Line number: " + to_string(lineNum));
+                return errMsg(e,"Usage \'mtlcolor Dr Dg Db Sr Sg Sb ka kd ks n [α η]\' @ Line number: " + to_string(lineNum));
             }
 
             if (mtlcolor.getOd().getR() > 1.0 || mtlcolor.getOd().getR() < 0.0)
@@ -223,9 +243,6 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(INVPRM,"mtlcolor specular green is out of range [0,1] @ Line number: " + to_string(lineNum));
             if (mtlcolor.getOs().getB() > 1.0 || mtlcolor.getOs().getB() < 0.0)
                 return errMsg(INVPRM,"mtlcolor specular blue is out of range [0,1] @ Line number: " + to_string(lineNum));
-
-            if (mtlcolor.getOpacity() > 1.0 || mtlcolor.getOpacity() < 0.0)
-                return errMsg(INVPRM, "mtlcolor opacity is out of range [0,1] @ Line number: " + to_string(lineNum));
         }
         else if (keyword == "sphere")
         {

@@ -12,7 +12,7 @@
 #include "texture.h"
 #include "IO.h"
 #include "constants.h"
-
+#include "traceRay.h"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ class sphere: public object
         sphere(point loc, double radius, material mtl, int texIndex);
         ~sphere();
         bool intersect(ray rr, double &t, fileData_t *fd);
-        rgb shadeRay(ray rr, double t, fileData_t *fd);//fd for lights, objects, textures
+        rgb shadeRay(ray rr, double t, fileData_t *fd, int depth);//fd for lights, objects, textures
         point getLoc();
         double getRadius();
         material getMtl();
