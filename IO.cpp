@@ -202,9 +202,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 try
                 {
                     alphaEta = getDoubleParams(2, inFileLine); //this is what might throw
-                    if (mtlcolor.getOpacity() > 1.0 || mtlcolor.getOpacity() < 0.0)
+
+                    if (alphaEta[0] > 1.0 || alphaEta[0] < 0.0)
                         return errMsg(INVPRM, "mtlcolor opacity is out of range [0,1] @ Line number: " + to_string(lineNum));
-                    if (mtlcolor.getEta() < 0.0)
+                    if (alphaEta[1] < 0.0)
                         return errMsg(INVPRM, "mtcolor eta is out of range [0,inf) @ Line number: " + to_string(lineNum));
                 }
                 catch(errNum e)
@@ -212,8 +213,8 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                     if (e == MSSPRM)
                     {
                        alphaEta = new double[2];
-                       alphaEta[0] = -1;//Undefined
-                       alphaEta[1] = -1;//Undefined
+                       alphaEta[0] = 1;//Default to opaque
+                       alphaEta[1] = -1;//undefined
                     }
                     else
                         return errMsg(e,"Usage \'mtlcolor Dr Dg Db Sr Sg Sb ka kd ks n [α η]\' @ Line number: " + to_string(lineNum));
@@ -330,7 +331,7 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             }
             catch(errNum e)
             {
-                return errMsg(e, "Usage \'cylx/y/z x/y y/z r\' @ Line number: " + to_string(lineNum));
+                return errMsg(e, "Usage \'cylx/y/z x/y y/z r min max\' @ Line number: " + to_string(lineNum));
             }
         }
         else if (keyword == "parallel")
@@ -629,7 +630,7 @@ texture getTexture(ifstream &texFile)
         delete[] pixelb;
     }
 
-    return texture(textureImg, width, height);
+    return texture(textureImg, height, width);
 }
 
 void writeOutFile(string outFileName, rgb **imgBuf, int imgWidth, int imgHeight)

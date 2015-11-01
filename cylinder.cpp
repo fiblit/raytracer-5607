@@ -104,103 +104,24 @@ rgb cylinder::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights
         cen = point(getU(), getV(), inter.getZ());
     vector3 n = (inter.subtract(cen)).fscale(radius);
     vector3 v = rr.getDir() * (-1);//TO the viewer
-    //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
 
+    rgb diffuse = mtl.getOd(); //TODO: add texturing!
+
+    //Begin calculating color
     rgb color = rgb(0, 0, 0);
-    for (light lit : *(fd->lights))
-    {
-        vector3 l;
-        if (lit.getIsPnt())
-            l = lit.getLoc().toPoint().subtract(inter);
-        else
-            l = lit.getLoc() * (-1);//TO the light (right?)
-        l = l.unit();
-        vector3 h = l + v;
-        h = h.unit();
 
-        int shadow = 1;
-        ray shadowrr(inter + l*EPSILON, l);
-        for(object* obj: *(fd->objects))//for each sphere (object) in scene
-        {
-            double tlig;
-            if(obj->intersect(shadowrr, tlig, fd))//if path to light interesects some sphere
-            {
-                if(lit.getIsPnt())
-                {
-                    if (tlig > 0 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
-                    {
-                        shadow = 0;//then in shadow
-                        break;
-                    }
-                }
-                else
-                {
-                    if(tlig > 0) // in front of me for directional
-                    {
-                        shadow = 0;//then in shadow
-                        break;
-                    }
-                }
-            }
-        }
+    //Add diffuse and specular color
+    shadeForEachLight(n, v, inter, diffuse, mtl, fd, color);//diffuse is Od since (infinite) cylinders can't be textured very easily (in the general case)
 
-        rgb dcolor = mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l)));
-        rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
-        color = color + lit.getColor() * (dcolor + scolor) * shadow;
-
-        if (color.getR() > 1.0)
-            color.setR(1.0);
-        if (color.getG() > 1.0)
-            color.setG(1.0);
-        if (color.getB() > 1.0)
-            color.setB(1.0);
-        //cout << "\nlight";
-        //cout << "n: " << n.getX() << " : " << n.getY() << " : " << n.getZ() << endl;
-        //cout << "v: " << v.getX() << " : " << v.getY() << " : " << v.getZ() << endl;
-        //cout << "l: " << l.getX() << " : " << l.getY() << " : " << l.getZ() << endl;
-        //cout << "h: " << h.getX() << " : " << h.getY() << " : " << h.getZ() << endl;
-        //rgb d = (mtl.getOd() * (mtl.getkd() * max(0.0, n.dotProduct(l))));
-        //rgb s = (mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn())));
-        //cout << "d: " << d.getR() << " : " << d.getG() << " : " << d.getB() << endl;
-        //cout << "s: " << s.getR() << " : " << s.getG() << " : " << s.getB() << endl;
-    }
-
+    //Add ambient color
     rgb acolor = mtl.getOd() * mtl.getka();
     color = color + acolor;
 
-    if (mtl.getEta() != -1)//eta and opacity have been defined
-    {
-        double etaIncident = 1.0; //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
-        double etaTransmit = mtl.getEta();
-        //Flipping n code
-        //flip etaTransmit etaIncident
-
-        vector3 incident = v;
-
-        //calculate reflected ray
-        double cosIncident = v.dotProduct(n);
-        vector3 reflected = (n * 2 * cosIncident) - incident;
-        ray reflecRay = ray(inter, reflected);
-
-        //Get color for reflected ray
-        rgb rcolor = rgb(0, 0, 0);
-        traceRay(reflecRay, fd, rcolor, depth);
-        double factor_0 = pow(((etaTransmit - etaIncident)/(etaTransmit + etaIncident)), 2);
-        double factor_r = factor_0 + (1 - factor_0)*pow(1 - cosIncident, 5);//schlick approximation of fresnel reflectance
-        color = color + rcolor * factor_r;
-
-        //transmitRay = ray();
-        //rgb tcolor = rgb();
-        //traceRay(transmitRay, fd, tcolor);
-    }
+    //Calculate reflective and transmitted components
+    shadeForTraces(n, v, inter, mtl, color, fd, depth);
 
     //Check for overflow
-    if (color.getR() > 1.0)
-        color.setR(1.0);
-    if (color.getG() > 1.0)
-        color.setG(1.0);
-    if (color.getB() > 1.0)
-        color.setB(1.0);
+    color = color.clamp();
 
     return color;
 }

@@ -7,6 +7,7 @@
 #include "light.h"
 #include "texture.h"
 #include "IO.h"
+#include "material.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class object
         virtual ~object();
         virtual bool intersect(ray rr, double &t, fileData_t *fd)=0;
         virtual rgb shadeRay(ray rr, double t, fileData_t *fd, int depth)=0;
+        virtual material getMtl()=0;
 };
 
 #endif // OBJECT_H

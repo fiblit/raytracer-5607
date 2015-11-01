@@ -59,3 +59,21 @@ rgb rgb::operator+ (const rgb &c)
 {
     return rgb(r + c.getR(), g + c.getG(), b + c.getB());
 }
+
+rgb rgb::clamp()
+{
+    rgb color = *this;
+    if (color.getR() > 1.0)
+        color.setR(1.0);
+    if (color.getG() > 1.0)
+        color.setG(1.0);
+    if (color.getB() > 1.0)
+        color.setB(1.0);
+    if (color.getR() < 0.0)
+        color.setR(0.0);
+    if (color.getG() < 0.0)
+        color.setG(0.0);
+    if (color.getB() < 0.0)
+        color.setB(0.0);
+    return color;
+}

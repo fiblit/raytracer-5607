@@ -17,6 +17,7 @@ class rgb
         rgb operator* (const double &s);
         rgb operator* (const rgb &c);
         rgb operator+ (const rgb &c);
+        rgb clamp();
     private:
         double r;
         double g;

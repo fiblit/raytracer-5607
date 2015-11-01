@@ -56,9 +56,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
     vector3 v = rr.getDir() * (-1);//TO the viewer
 
     rgb diffuse;
-    if (texIndex == -1)
-        diffuse = mtl.getOd();
-    else
+    if (texIndex != -1)
     {
         double theta = atan2(n.getY(), n.getX());
         double phi = acos(n.getZ());
@@ -69,132 +67,23 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
 
         diffuse = (*(fd->textures))[texIndex].getImg()[(int)(0.5 + vTex * ((*(fd->textures))[texIndex].getHeight() - 1))][(int)(0.5 + uTex * ((*(fd->textures))[texIndex].getWidth() - 1))];
     }
+    else
+        diffuse = mtl.getOd();
+
+    //Begin calculating color
     rgb color = rgb(0, 0, 0);
-    //cout << "rr: " << rr.getDir().getX() << " : " << rr.getDir().getY() << " : " << rr.getDir().getZ() << endl;
 
     //Calculate diffuse and specular components
-    for (light lit : *(fd->lights))
-    {
-        vector3 l;
-        if (lit.getIsPnt())
-            l = lit.getLoc().toPoint().subtract(inter);
-        else
-            l = lit.getLoc() * (-1);//TO the light (right?)
-        l = l.unit();
-        vector3 h = l + v;
-        h = h.unit();
-
-        int shadow = 1;
-        ray shadowrr(inter + l*EPSILON, l);
-        for(object* obj: *(fd->objects))//for each sphere (object) in scene
-        {
-            double tlig;
-            if(obj->intersect(shadowrr, tlig, fd))//if path to light interesects some sphere
-            {
-                if(lit.getIsPnt())
-                {
-                    if (tlig > 0 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
-                    {
-                        shadow = 0;
-                        break;
-                    }
-                }
-                else
-                {
-                    if(tlig > 0) // in front of me for directional
-                    {
-                        shadow = 0;
-                        break;
-                    }
-                }
-            }
-        }
-
-        rgb dcolor = diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)));
-        rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
-        color = color + lit.getColor() * (dcolor + scolor) * shadow;
-
-        //Check for overflow
-        if (color.getR() > 1.0)
-            color.setR(1.0);
-        if (color.getG() > 1.0)
-            color.setG(1.0);
-        if (color.getB() > 1.0)
-            color.setB(1.0);
-    }
+    shadeForEachLight(n, v, inter, diffuse, mtl, fd, color);
 
     rgb acolor = diffuse * mtl.getka();
     color = color + acolor;
 
-     //Check for overflow
-    if (color.getR() > 1.0)
-        color.setR(1.0);
-    if (color.getG() > 1.0)
-        color.setG(1.0);
-    if (color.getB() > 1.0)
-        color.setB(1.0);
+    //Check for overflow
+    color = color.clamp();
 
-    if (mtl.getEta() != -1 && mtl.getOpacity() != -1)//eta and opacity have been defined
-    {
-        double etaIncident = 1.0; //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
-        double etaTransmit = mtl.getEta(); //Will vary for transmitted and stack
-
-        double cosIncident = v.dotProduct(n);
-        if (cosIncident < 0)//Backside of surface
-        {
-            n = n * -1;
-            cosIncident = v.dotProduct(n);//recalculate cosIncident
-            double t = etaIncident;//swap incident and transmit as we are on the inside of the surface, NOTE/TODO: This won't work for stack
-            etaIncident = etaTransmit;
-            etaTransmit = t;
-        }
-
-        vector3 incident = v;
-
-        //calculate reflected ray
-        vector3 reflected = (n * 2 * cosIncident) - incident;
-        ray reflecRay = ray(inter, reflected);
-
-        //Get color for reflected ray
-        rgb rcolor = rgb(0, 0, 0);
-        traceRay(reflecRay, fd, rcolor, depth);
-        double factor_0 = pow(((etaTransmit - etaIncident)/(etaTransmit + etaIncident)), 2);
-        double factor_r = factor_0 + (1 - factor_0)*pow(1 - cosIncident, 5);//schlick approximation of fresnel reflectance
-        color = color + rcolor * factor_r;
-
-         //Check for overflow
-        if (color.getR() > 1.0)
-            color.setR(1.0);
-        if (color.getG() > 1.0)
-            color.setG(1.0);
-        if (color.getB() > 1.0)
-            color.setB(1.0);
-
-        //calculate transmitted ray
-        double sinIncident = sqrt(1 - pow(cosIncident, 2));
-        double etaRatio = etaIncident/etaTransmit;
-        if (sinIncident <= etaRatio)
-        {
-            vector3 transmitted = (n * -1)
-                * sqrt(1 - (pow(etaRatio, 2) * (1 - pow(cosIncident, 2))))
-                + (n * cosIncident - incident) * etaRatio;
-            //vector3 transmitted = (n * (-1)) * sqrt(1 - pow(etaRatio, 2) * (1 - pow(cosIncident, 2))) + (n * cosIncident - incident) * etaRatio;
-            ray transmitRay(inter + transmitted * EPSILON, transmitted);
-
-            //get color for transmitted ray
-            rgb tcolor = rgb(0, 0, 0);
-            traceRay(transmitRay, fd, tcolor, depth);
-            color = color + tcolor * (1 - factor_r) * (1 - mtl.getOpacity());
-        }
-
-        //Check for overflow
-        if (color.getR() > 1.0)
-            color.setR(1.0);
-        if (color.getG() > 1.0)
-            color.setG(1.0);
-        if (color.getB() > 1.0)
-            color.setB(1.0);
-    }
+    //Calculate reflective and transmitted components
+    shadeForTraces(n, v, inter, mtl, color, fd, depth);
 
     return color;
 }

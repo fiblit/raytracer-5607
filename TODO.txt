@@ -1,14 +1,10 @@
-(finish adding) transparency to spheres
-Add transparency to triangles
-Add transparency to cylinders
-  Add TIR handling for transparency
-  Add soft shadows for transparency
-Handle overflow/numerical error
+(Guarentee that transparency is correct, particularly for triangles)
+  Fix soft shadows for transparency
 (EC) Add distributed ray tracing
 (EC) Add viewdist keyword
 (EC) Add depth of field effects
 (Optional) Add stack for hollow spheres
-Model that awesome scene idea (Battle of the Hill)
+Model that awesome scene idea (Battle of the Hill) : Warning the renderer is severely limiting in comparison to my imagination
 Model that OTHER scene idea (Constellation room)
 (Optional) Add handler functions for getInFileData
 (Optional) Add keywords to make distributed ray tracing optional
