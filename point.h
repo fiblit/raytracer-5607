@@ -2,6 +2,9 @@
 #define POINT_H
 
 #include "vector3.h"
+#include <random>//jitter
+#include <chrono>//jitter
+#include <functional>//jitter
 
 class point
 {
@@ -17,6 +20,7 @@ class point
 		double getY();
 		double getZ();
 		point operator+(const vector3 &u);
+		point jitter(double jit);
     private:
 		double x;
 		double y;

@@ -1,15 +1,15 @@
 (Guarentee that transparency is correct, particularly for triangles)
-(EC) Add distributed ray tracing
-(EC) Add viewdist keyword
-(EC) Add depth of field effects
-(Optional) Add stack for hollow spheres
+("Done" but HARD to model with Add depth of field effects)
+(Optional?) Add stack for hollow spheres
 Model that awesome scene idea (Battle of the Hill) : Warning the renderer is severely limiting in comparison to my imagination
 Model that OTHER scene idea (Constellation room)
+Clean up memory errors
 (Optional) Add handler functions for getInFileData
-(Optional) Add keywords to make distributed ray tracing optional
+(Optional) add distributed ray tracing for reflection and transmission
+(Optional) Add keywords to make distributed (on reflections/transmission )ray tracing optional
   ^^ This may include adding more to mtlcolor or a mtlprop class/keyword
 (delayed) Fix numerical error bugs
-Clean up memory errors
+
 
 (Optional) Add -o delimiter for outputs in the command-line. (e.g. raytrace inputfiles -o outputfiles)
 (Optional) Increase makefile generalization (e.g. put source in src. Essentially organize.)

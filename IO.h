@@ -45,6 +45,8 @@ typedef struct fileData
     vector<point> *vertices;
     vector<textureCoord> *vTextures;
     vector<vector3> *vNormals;
+    double *viewDist;
+    bool *softShadow;
 } fileData_t;
 int getInFileData(ifstream &inFile, fileData_t fd);
 int *getIntParams(int n, string &line);

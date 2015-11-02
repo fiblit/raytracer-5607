@@ -11,7 +11,6 @@
 #include "vector3.h"
 #include "point.h"
 #include "light.h"
-const int MAXRECURSIONDEPTH = 20;
 
 void traceRay(ray rr, fileData_t *fd, rgb &color, int depth);
 //What follows are essentially helper functions in any object::shadeRay function

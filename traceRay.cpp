@@ -5,7 +5,7 @@
 /* find the color of a ray */
 void traceRay(ray rr, fileData_t *fd, rgb &color, int depth)
 {
-    if (depth > MAXRECURSIONDEPTH)//recursive termination
+    if (depth > MAXRECURSIONDEPTH)
         return;
 
     vector<object *> objects = *(fd->objects);
@@ -29,21 +29,48 @@ void shadeForEachLight(vector3 n, vector3 v, point inter, rgb diffuse, material 
 {
     for (light lit : *(fd->lights))
     {
-        vector3 l;
-        if (lit.getIsPnt())
-            l = lit.getLoc().toPoint().subtract(inter);
+        if (*(fd->softShadow))
+        {
+            rgb clrs[RAYBUNDLESIZE] = {rgb(0, 0, 0)};
+            rgb *colors = clrs;
+            for (int i = 0; i < RAYBUNDLESIZE; i++)
+            {
+                vector3 l;
+                point litLoc = lit.getLoc().toPoint().jitter(0.75);
+                if (lit.getIsPnt())
+                    l = litLoc.subtract(inter);
+                else
+                    l = litLoc.vect() * (-1);//TO the light (right?)
+                l = l.unit();
+                vector3 h = l + v;
+                h = h.unit();
+
+                double shadow = calculateShadowValue(inter, l, fd, lit);
+
+                rgb dcolor = diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)));
+                rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
+                colors[i] = lit.getColor() * (dcolor + scolor) * shadow;
+            }
+
+            color = color + color.average(colors, RAYBUNDLESIZE);
+        }
         else
-            l = lit.getLoc() * (-1);//TO the light (right?)
-        l = l.unit();
-        vector3 h = l + v;
-        h = h.unit();
+        {
+            vector3 l;
+            if (lit.getIsPnt())
+                l = lit.getLoc().toPoint().subtract(inter);
+            else
+                l = lit.getLoc() * (-1);//TO the light (right?)
+            l = l.unit();
+            vector3 h = l + v;
+            h = h.unit();
 
-        double shadow = calculateShadowValue(inter, l, fd, lit);
+            double shadow = calculateShadowValue(inter, l, fd, lit);
 
-        rgb dcolor = diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)));
-        rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
-        color = color + lit.getColor() * (dcolor + scolor) * shadow;
-
+            rgb dcolor = diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)));
+            rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
+            color = color + lit.getColor() * (dcolor + scolor) * shadow;
+        }
         //Check for overflow
         color = color.clamp();
     }

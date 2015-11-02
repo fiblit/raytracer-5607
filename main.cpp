@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
     vector<point> vertices;
     vector<textureCoord> vTextures;
     vector<vector3> vNormals;
+    double viewDist;
+    bool softShadow;
     //init fileData
     fileData_t fd;
     fd.eye = &eye;
@@ -92,6 +94,8 @@ int main(int argc, char *argv[])
     fd.vertices = &vertices;
     fd.vTextures = &vTextures;
     fd.vNormals = &vNormals;
+    fd.viewDist = &viewDist;
+    fd.softShadow = &softShadow;
     if ((errval = getInFileData(inFile, fd)))
         return errval;
     inFile.close();
@@ -110,8 +114,7 @@ int main(int argc, char *argv[])
     u = u.unit();
     vector3 nviewdir = viewdir.unit();
     vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
-    //Since it is arbitrary, focal depth or "d" is 1.0 for convenience. Therefore it is never written, since it is only used in multiplications!
-    double viewWidth = 2*tan(fovh/2*PI/180);
+    double viewWidth = 2*viewDist*tan(fovh/2*PI/180);
     double viewHeight = viewWidth/aspect;
     point ul = (eye.vect() + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point ur = (eye.vect() + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
@@ -119,26 +122,80 @@ int main(int argc, char *argv[])
     point lr = (eye.vect() - v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();//unused
     if (!parallel)
     {
-        ul = ul + nviewdir;
-        ur = ur + nviewdir;
-        ll = ll + nviewdir;
-        lr = lr + nviewdir;
+        if (viewDist != -1)
+        {
+            ul = ul + nviewdir * viewDist;
+            ur = ur + nviewdir * viewDist;
+            ll = ll + nviewdir * viewDist;
+            lr = lr + nviewdir * viewDist;
+        }
+        else
+        {
+            ul = ul + nviewdir;
+            ur = ur + nviewdir;
+            ll = ll + nviewdir;
+            lr = lr + nviewdir;
+        }
     }
     vector3 deltav = ll.subtract(ul).fscale(imgHeight-1);
     vector3 deltah = ur.subtract(ul).fscale(imgWidth-1);
 
     //Raycast/trace loop
-    for(int y = 0; y < imgHeight; y++)//for each pixel in image
+
+    if (viewDist != -1)//Do depth of field bundle
     {
-        for(int x = 0; x < imgWidth; x++)
+        rgb ***imgBufBundle = new rgb**[imgHeight];//imgBuf's where each "pixel" is actually DOFBUNDLESIZE # of pixels
+        for (int i = 0; i < imgHeight; i++)
         {
-            ray curRay;
-            if (parallel)
-                curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
-            else
-                curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
-            imgBuf[y][x] = bkgcolor;//initialize to background
-            traceRay(curRay, &fd, imgBuf[y][x], 0);
+            imgBufBundle[i] = new rgb*[imgWidth];
+            for (int j = 0; j < imgWidth; j++)
+                imgBufBundle[i][j] = new rgb[DOFBUNDLESIZE];
+        }
+
+        for (int i = 0; i<DOFBUNDLESIZE; i++)//trace out RAYBUNDLESIZE rays, taking the average result
+        {
+            point newEye = eye.jitter(0.75);
+            for(int y = 0; y < imgHeight; y++)//for each pixel in image
+            {
+                for(int x = 0; x < imgWidth; x++)
+                {
+                    ray curRay;
+                    if (parallel)
+                        curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
+                    else
+                        curRay = ray(newEye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - newEye.vect()).unit());
+                    imgBufBundle[y][x][i] = bkgcolor;//initialize to background
+                    traceRay(curRay, &fd, imgBufBundle[y][x][i], 0);
+                }
+            }
+        }
+
+        for (int i = 0; i < imgHeight; i++)
+            for (int j = 0; j < imgWidth; j++)
+                imgBuf[i][j] = imgBuf[i][j].average(imgBufBundle[i][j], DOFBUNDLESIZE);
+
+        for (int i = 0; i < imgHeight; i++)
+        {
+            for (int j = 0; j < imgWidth; j++)
+                delete[] imgBufBundle[i][j];
+            delete[] imgBufBundle[i];
+        }
+        delete[] imgBufBundle;
+    }
+    else
+    {
+        for(int y = 0; y < imgHeight; y++)//for each pixel in image
+        {
+            for(int x = 0; x < imgWidth; x++)
+            {
+                ray curRay;
+                if (parallel)
+                    curRay = ray((ul.vect() + deltah.scale(x) + deltav.scale(y)).toPoint(), nviewdir);//nviewdir is just viewdir.unit()
+                else
+                    curRay = ray(eye, (ul.vect() + deltah.scale(x) + deltav.scale(y) - eye.vect()).unit());
+                imgBuf[y][x] = bkgcolor;//initialize to background
+                traceRay(curRay, &fd, imgBuf[y][x], 0);
+            }
         }
     }
 

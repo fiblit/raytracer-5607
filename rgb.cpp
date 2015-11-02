@@ -77,3 +77,14 @@ rgb rgb::clamp()
         color.setB(0.0);
     return color;
 }
+
+rgb rgb::average(rgb *colors, int len)
+{
+    rgb color(0, 0, 0);
+    for (int i = 0; i < len; i++)
+    {
+        color = color + colors[i];
+    }
+    color = color * (1.0/len);
+    return color;
+}

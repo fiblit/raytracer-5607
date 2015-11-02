@@ -27,3 +27,8 @@ void ray::setDir(vector3 dir)
 {
     this->dir = dir;
 }
+
+ray ray::jitter(double jit)
+{
+    return ray(this->getLoc().jitter(jit), this->getDir());
+}

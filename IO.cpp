@@ -53,9 +53,9 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
     //read data
     material mtlcolor;
-    bool kwdIsDef [9] = {false, false, false, false, false, false, false, false, false};//we shouldn't see most keywords twice
+    bool kwdIsDef [11] = {false, false, false, false, false, false, false, false, false, false, false};//we shouldn't see most keywords twice
         //we also should see mtlcolor before the first sphere
-    enum kwd {EYE, VIEWDIR, UPDIR, FOVH, IMSIZE, BKGCOLOR, MTLCOLOR, PARALLEL, TEXTURE};//we don't need to know about sphere (objects) being defined
+    enum kwd {EYE, VIEWDIR, UPDIR, FOVH, IMSIZE, BKGCOLOR, MTLCOLOR, PARALLEL, TEXTURE, VIEWDIST, SOFTSHADOW};//we don't need to know about sphere (objects) being defined
     while(!inFile.eof())
     {
         //determine keyword
@@ -520,6 +520,33 @@ int getInFileData(ifstream &inFile, fileData_t fd)
 
             //No deletes since the params aren't on the heap this time :P
         }
+        else if (keyword == "viewdist")
+        {
+            if (kwdIsDef[VIEWDIST])
+                return errMsg(REPKWD, "Line number: " + to_string(lineNum));
+            try
+            {
+                double *params = getDoubleParams(1, inFileLine);//might throw
+                *fd.viewDist = params[0];
+                kwdIsDef[VIEWDIST] = true;
+
+                delete[] params;
+            }
+            catch(errNum e)
+            {
+                return errMsg(e,"Usage \'viewdist d\' @ Line number: " + to_string(lineNum));
+            }
+
+            if (*fd.viewDist <=0) //validate value
+                return errMsg(INVPRM,"viewdist is out of range (0,inf) @ Line number: " + to_string(lineNum));
+        }
+        else if (keyword == "softshadow")
+        {
+            if (kwdIsDef[SOFTSHADOW])
+                return errMsg(REPKWD, "please use one softshadow keyword. Remove softshadow @ Line number: " + to_string(lineNum));
+            *fd.softShadow = true;
+            kwdIsDef[SOFTSHADOW] = true;
+        }
         else if (keyword[0] == '#')//I AM A COMMENT
             ;//                     ^^^ He is a comment
         else if (keyword == "")// this is actually a blank line due to the way getword and getline work.
@@ -539,6 +566,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
             return errMsg(MSSKWD,"Please define " + kwdString[i]);
     if (!kwdIsDef[PARALLEL])
         *fd.parallel = false;
+    if (!kwdIsDef[VIEWDIST])
+        *fd.viewDist = -1;//-1 means undefined
+    if (!kwdIsDef[SOFTSHADOW])
+        *fd.softShadow = false;
 
     inFile.close();
     return 0;

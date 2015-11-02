@@ -18,6 +18,7 @@ class rgb
         rgb operator* (const rgb &c);
         rgb operator+ (const rgb &c);
         rgb clamp();
+        rgb average(rgb *colors, int len);
     private:
         double r;
         double g;

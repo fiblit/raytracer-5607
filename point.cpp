@@ -53,3 +53,15 @@ point point::operator+(const vector3 &u)
 {
     return point(x + u.getX(), y + u.getY(), z + u.getZ());
 }
+
+point point::jitter(double jit)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator (seed);
+    std::uniform_real_distribution<double> distribution(-jit, jit);
+    auto delta = std::bind (distribution, generator);
+    double dx = delta();
+    double dy = delta();
+    double dz = delta();
+    return point(this->getX() + dx, this->getY() + dy, this->getZ() + dz);
+}
