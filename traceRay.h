@@ -11,11 +11,12 @@
 #include "vector3.h"
 #include "point.h"
 #include "light.h"
+const int MAXRECURSIONDEPTH = 20;
 
 void traceRay(ray rr, fileData_t *fd, rgb &color, int depth);
 //What follows are essentially helper functions in any object::shadeRay function
 void shadeForEachLight(vector3 n, vector3 v, point inter, rgb diffuse, material mtl, fileData_t *fd, rgb &color);
-int calculateShadowValue(point inter, vector3 l, fileData_t *fd, light lit);
+double calculateShadowValue(point inter, vector3 l, fileData_t *fd, light lit);
 void shadeForTraces(vector3 n, vector3 v, point inter, material mtl, rgb &color, fileData_t* fd, int depth);
 void shadeForReflection(
     double etaIncident,

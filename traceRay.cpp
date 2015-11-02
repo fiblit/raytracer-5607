@@ -5,7 +5,7 @@
 /* find the color of a ray */
 void traceRay(ray rr, fileData_t *fd, rgb &color, int depth)
 {
-    if (depth > 20)//recursive termination
+    if (depth > MAXRECURSIONDEPTH)//recursive termination
         return;
 
     vector<object *> objects = *(fd->objects);
@@ -38,7 +38,7 @@ void shadeForEachLight(vector3 n, vector3 v, point inter, rgb diffuse, material 
         vector3 h = l + v;
         h = h.unit();
 
-        int shadow = calculateShadowValue(inter, l, fd, lit);
+        double shadow = calculateShadowValue(inter, l, fd, lit);
 
         rgb dcolor = diffuse * (mtl.getkd() * max(0.0, n.dotProduct(l)));
         rgb scolor = mtl.getOs() * (mtl.getks() * pow(max(0.0, n.dotProduct(h)), mtl.getn()));
@@ -50,9 +50,9 @@ void shadeForEachLight(vector3 n, vector3 v, point inter, rgb diffuse, material 
 }
 
 /* calculate shadow value */
-int calculateShadowValue(point inter, vector3 l, fileData_t *fd, light lit)
+double calculateShadowValue(point inter, vector3 l, fileData_t *fd, light lit)
 {
-    int shadow = 1;
+    double shadow = 1;
     ray shadowrr(inter + l*EPSILON, l);
     for(object* obj: *(fd->objects))//for each sphere (object) in scene
     {
@@ -63,14 +63,14 @@ int calculateShadowValue(point inter, vector3 l, fileData_t *fd, light lit)
             {
                 if (tlig > 0 && (tlig <= lit.getLoc().toPoint().subtract(inter).length())) //or between us for point
                 {
-                    shadow = shadow * (1 - obj->getMtl().getOpacity());
+                    shadow *= (1 - obj->getMtl().getOpacity());
                 }
             }
             else
             {
                 if(tlig > 0) // in front of me for directional
                 {
-                    shadow = shadow * (1 - obj->getMtl().getOpacity());
+                    shadow *= (1 - obj->getMtl().getOpacity());
                 }
             }
         }

@@ -1,5 +1,4 @@
 (Guarentee that transparency is correct, particularly for triangles)
-  Fix soft shadows for transparency
 (EC) Add distributed ray tracing
 (EC) Add viewdist keyword
 (EC) Add depth of field effects
