@@ -1,5 +1,3 @@
-(Guarentee that transparency is correct, particularly for triangles)
-("Done" but HARD to model with Add depth of field effects)
 (Optional?) Add stack for hollow spheres
 Model that awesome scene idea (Battle of the Hill) : Warning the renderer is severely limiting in comparison to my imagination
 Model that OTHER scene idea (Constellation room)

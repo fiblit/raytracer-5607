@@ -52,7 +52,7 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
     I_l = ka*Od_l + Sum_i=1_nlights [Ip_i_l * sh * [kd*Od_l (N dot L_i) + ks * Os_l (N dot H_i)^n]] + reflected + transmitted
     */
     point inter = rr.getLoc() + rr.getDir() * t;
-    vector3 n = (inter.subtract(loc)).fscale(radius);
+    vector3 n = (inter.subtract(loc)).fscale(radius).unit();//The .unit() is a fix to a cryptic bug...
     vector3 v = rr.getDir() * (-1);//TO the viewer
 
     rgb diffuse;
@@ -82,8 +82,10 @@ rgb sphere::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights, 
     //Check for overflow
     color = color.clamp();
 
+    bool backside = surfaceBack(n, v);
+
     //Calculate reflective and transmitted components
-    shadeForTraces(n, v, inter, mtl, color, fd, depth);
+    shadeForTraces(n, v, inter, mtl, color, fd, depth, backside);
 
     return color;
 }

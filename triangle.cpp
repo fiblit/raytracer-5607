@@ -102,6 +102,7 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd, int depth)//fd for ligh
     //Begin calculating color
     rgb color = rgb(0, 0, 0);
 
+
     //Calculate diffuse and specular components
     shadeForEachLight(n, v, inter, diffuse, mtl, fd, color);
 
@@ -111,8 +112,10 @@ rgb triangle::shadeRay(ray rr, double t, fileData_t *fd, int depth)//fd for ligh
     //Check for overflow
     color = color.clamp();
 
+    bool backside = surfaceBack(n, v);
+
     //Calculate reflective and transmitted components
-    shadeForTraces(n, v, inter, mtl, color, fd, depth);
+    shadeForTraces(n, v, inter, mtl, color, fd, depth, backside);
 
     return color;
 }

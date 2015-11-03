@@ -117,8 +117,10 @@ rgb cylinder::shadeRay(ray rr, double t, fileData *fd, int depth)//fd for lights
     rgb acolor = mtl.getOd() * mtl.getka();
     color = color + acolor;
 
+    bool backside = surfaceBack(n, v);
+
     //Calculate reflective and transmitted components
-    shadeForTraces(n, v, inter, mtl, color, fd, depth);
+    shadeForTraces(n, v, inter, mtl, color, fd, depth, backside);
 
     //Check for overflow
     color = color.clamp();

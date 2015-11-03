@@ -371,6 +371,10 @@ int getInFileData(ifstream &inFile, fileData_t fd)
                 return errMsg(e, "Usage \'texture texture_file.ppm\' @ Line Number: " + to_string(lineNum));
             }
         }
+        else if (keyword == "textureoff")//BEST. KEYWORD. EVER.
+        {
+            kwdIsDef[TEXTURE] = false;
+        }
         else if (keyword == "v")
         {
             try

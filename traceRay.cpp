@@ -5,7 +5,7 @@
 /* find the color of a ray */
 void traceRay(ray rr, fileData_t *fd, rgb &color, int depth)
 {
-    if (depth > MAXRECURSIONDEPTH)
+    if (depth >= MAXRECURSIONDEPTH)
         return;
 
     vector<object *> objects = *(fd->objects);
@@ -22,6 +22,18 @@ void traceRay(ray rr, fileData_t *fd, rgb &color, int depth)
     }
     if (closest!=-1)
         color = (objects[closest]->shadeRay(rr, closestInter, fd, depth+1));//I'm pretty sure this doesn't work, if not, I can malloc here
+}
+
+/* test for backside hit, and flip n */
+bool surfaceBack(vector3 &n, vector3 v)
+{
+    if (n.dotProduct(v) < 0)
+    {
+        n = n * -1;
+        return true;
+    }
+    else
+        return false;
 }
 
 /* calculate diffuse and specular components of the color. These are the light based components of the phong model */
@@ -107,17 +119,15 @@ double calculateShadowValue(point inter, vector3 l, fileData_t *fd, light lit)
 
 
 /* calculate transmitted and reflected component of color */
-void shadeForTraces(vector3 n, vector3 v, point inter, material mtl, rgb &color, fileData_t* fd, int depth)
+void shadeForTraces(vector3 n, vector3 v, point inter, material mtl, rgb &color, fileData_t* fd, int depth, bool backside)
 {
     if (mtl.getEta() != -1 && mtl.getOpacity() != -1)//eta and opacity have been defined
     {
         double etaIncident = 1.0; //Will vary when object stack is implemented ( stack.top().getMtl().getEta() )
         double etaTransmit = mtl.getEta(); //Will vary for stack mtl.getEta(), but later when n is flipped, the stack top will have to be flipped? (Unless it also holds in/out?)
         double cosIncident = v.dotProduct(n);
-        if (cosIncident < 0)//Backside of surface
+        if (backside)//n was previously flipped
         {
-            n = n * -1;
-            cosIncident = v.dotProduct(n);//recalculate cosIncident
             double t = etaIncident;//swap incident and transmit as we are on the inside of the surface, NOTE/TODO: This won't work for stack
             etaIncident = etaTransmit;
             etaTransmit = t;
@@ -175,12 +185,13 @@ void shadeForTransmission(
     int depth)
 {
     //calculate transmitted ray
-    double sinIncident = sqrt(1 - pow(cosIncident, 2));
-    double etaRatio = etaIncident/etaTransmit;
+    double sinIncident2 = 1 - pow(cosIncident, 2);
+    double sinIncident = sqrt(sinIncident2);
     if (sinIncident <= etaTransmit/etaIncident && mtl.getOpacity() != 1)//check for TIR and unneccesary computation
     {
+        double etaRatio = etaIncident/etaTransmit;
         vector3 transmitted = (n * -1)
-            * sqrt(1 - (pow(etaRatio, 2) * (1 - pow(cosIncident, 2))))
+            * sqrt(1 - pow(etaRatio, 2) * sinIncident2)//hilariously enough, this never causes problems due to quiet NaNs
             + (n * cosIncident - incident) * etaRatio;
         ray transmitRay(inter + transmitted * EPSILON, transmitted);
 
@@ -188,8 +199,8 @@ void shadeForTransmission(
         rgb tcolor = rgb(0, 0, 0);
         traceRay(transmitRay, fd, tcolor, depth);
         color = color + tcolor * (1 - factor_r) * (1 - mtl.getOpacity());
-    }
 
-    //Check for overflow
-    color = color.clamp();
+        //Check for overflow
+        color = color.clamp();
+    }
 }
