@@ -114,7 +114,9 @@ int main(int argc, char *argv[])
     u = u.unit();
     vector3 nviewdir = viewdir.unit();
     vector3 v = u.crossProduct(nviewdir); //Find the vector vertical to the window //v is unit length due to above line
-    double viewWidth = 2*viewDist*tan(fovh/2*PI/180);
+    double viewWidth = 2*tan(fovh/2*PI/180);
+    if (viewDist != -1)
+        viewWidth*=viewDist;
     double viewHeight = viewWidth/aspect;
     point ul = (eye.vect() + v.scale(viewHeight/2) - u.scale(viewWidth/2)).toPoint();
     point ur = (eye.vect() + v.scale(viewHeight/2) + u.scale(viewWidth/2)).toPoint();
