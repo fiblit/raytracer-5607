@@ -1,7 +1,10 @@
-(Optional?) Add stack for hollow spheres
 Model that awesome scene idea (Battle of the Hill) : Warning the renderer is severely limiting in comparison to my imagination
 Model that OTHER scene idea (Constellation room)
 Clean up memory errors
+
+# EVERYTHING AFTER THIS POINT IS INDEFINITELY DELAYED #
+
+(Optional?) Add stack for hollow spheres
 (Optional) Add handler functions for getInFileData
 (Optional) add distributed ray tracing for reflection and transmission
 (Optional) Add keywords to make distributed (on reflections/transmission )ray tracing optional

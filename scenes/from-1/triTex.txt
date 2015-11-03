@@ -1,0 +1,24 @@
+eye  5 5 5
+viewdir  -1 -1 -1
+updir  0.0 1.0 0.0
+fovh  30.0
+imsize  500 500
+
+bkgcolor 0.0 0.0 0.0
+
+light 0.0 0.0 5.0 1 1 1 1
+
+mtlcolor 0.0 0.0 1.0  1 1 1  0.2 0.4 0.4 20
+texture textures/worldTexture.ppm
+
+v 1 0 0
+v 0 1 0
+v 0 0 1
+vt 1 1
+vt 0.5 0
+vt 0 1
+vn 1 0 0
+vn 0 1 0
+vn 0 0 1
+
+f 1/1 2/2 3/3
