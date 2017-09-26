@@ -1,5 +1,3 @@
-# Dalton Hildreth, ***REMOVED*** #
-
 OS: Ubunutu 14.04 LTS 
 🐧 <- this is a penguin in unicode, if you can't see it.
 If you haven't looked it up yet, look it up. It's kinda cute.
